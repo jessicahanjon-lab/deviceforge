@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="DeviceForge"/>
+  <meta name="theme-color" content="#0d0d1a"/>
+  <meta name="description" content="Craft your perfect home screen — DeviceForge PWA"/>
+  <title>DeviceForge</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <style>
+    /* ============================================================
+       LIQUID GLASS DESIGN SYSTEM — iOS 26 inspired
+    ============================================================ */
+    :root {
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      --mono: 'DM Mono', monospace;
+
+      /* Core backgrounds */
+      --bg-deep:    #050510;
+      --bg-base:    #0a0a1e;
+      --bg-mid:     #0f0f2a;
+
+      /* Liquid glass surfaces */
+      --glass-1:    rgba(255,255,255,0.04);
+      --glass-2:    rgba(255,255,255,0.07);
+      --glass-3:    rgba(255,255,255,0.11);
+      --glass-4:    rgba(255,255,255,0.16);
+
+      /* Borders */
+      --border-1:   rgba(255,255,255,0.06);
+      --border-2:   rgba(255,255,255,0.12);
+      --border-3:   rgba(255,255,255,0.22);
+      --border-top: rgba(255,255,255,0.35); /* top highlight */
+
+      /* Text */
+      --t1: rgba(255,255,255,0.95);
+      --t2: rgba(255,255,255,0.55);
+      --t3: rgba(255,255,255,0.30);
+
+      /* Accents */
+      --accent:  #a78bfa;
+      --accent2: #7c3aed;
+      --green:   rgba(52,211,153,0.9);
+      --pink:    rgba(244,114,182,0.9);
+      --gold:    rgba(251,191,36,0.9);
+
+      /* Shadows */
+      --shadow-sm:  0 2px 8px rgba(0,0,0,0.4);
+      --shadow-md:  0 8px 32px rgba(0,0,0,0.5);
+      --shadow-lg:  0 24px 64px rgba(0,0,0,0.65);
+      --glow:       0 0 40px rgba(167,139,250,0.15);
+
+      /* Radii */
+      --r-xs: 8px;
+      --r-sm: 14px;
+      --r-md: 20px;
+      --r-lg: 28px;
+      --r-xl: 36px;
+    }
+
+    [data-theme="light"] {
+      --bg-deep:  #e8e8f5;
+      --bg-base:  #efeffa;
+      --bg-mid:   #f5f5ff;
+      --glass-1:  rgba(255,255,255,0.45);
+      --glass-2:  rgba(255,255,255,0.60);
+      --glass-3:  rgba(255,255,255,0.70);
+      --glass-4:  rgba(255,255,255,0.80);
+      --border-1: rgba(0,0,0,0.06);
+      --border-2: rgba(0,0,0,0.10);
+      --border-3: rgba(0,0,0,0.16);
+      --border-top: rgba(255,255,255,0.9);
+      --t1: rgba(10,10,30,0.92);
+      --t2: rgba(10,10,30,0.50);
+      --t3: rgba(10,10,30,0.28);
+    }
+
+    /* ===== RESET ===== */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+    body{
+      font-family:var(--font);
+      background:var(--bg-deep);
+      color:var(--t1);
+      min-height:100dvh;
+      overflow-x:hidden;
+      position:relative;
+    }
+    button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+    /* ===== AMBIENT BACKGROUND ===== */
+    .ambient-bg {
+      position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    }
+    .orb {
+      position:absolute;border-radius:50%;filter:blur(80px);opacity:0.18;
+      animation:orbFloat ease-in-out infinite alternate;
+    }
+    .orb1{width:600px;height:600px;background:radial-gradient(circle,#7c3aed,transparent 70%);top:-100px;left:-150px;animation-duration:9s}
+    .orb2{width:500px;height:500px;background:radial-gradient(circle,#0ea5e9,transparent 70%);bottom:-80px;right:-100px;animation-duration:11s}
+    .orb3{width:350px;height:350px;background:radial-gradient(circle,#ec4899,transparent 70%);top:40%;left:40%;animation-duration:7s}
+    @keyframes orbFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(30px,20px) scale(1.08)}}
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar{width:3px}
+    ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px}
+
+    /* ===== GLASS MIXIN ===== */
+    .glass {
+      background:var(--glass-2);
+      backdrop-filter:blur(24px) saturate(180%);
+      -webkit-backdrop-filter:blur(24px) saturate(180%);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .glass-heavy {
+      background:var(--glass-3);
+      backdrop-filter:blur(40px) saturate(200%);
+      -webkit-backdrop-filter:blur(40px) saturate(200%);
+      border:1px solid var(--border-3);
+      border-top-color:var(--border-top);
+      box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,0.14);
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position:sticky;top:0;z-index:100;
+      height:60px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 clamp(14px,4vw,40px);
+      gap:12px;
+      background:rgba(5,5,16,0.6);
+      backdrop-filter:blur(32px) saturate(180%);
+      -webkit-backdrop-filter:blur(32px) saturate(180%);
+      border-bottom:1px solid var(--border-1);
+    }
+    .brand {
+      display:flex;align-items:center;gap:10px;
+      text-decoration:none;color:var(--t1);
+    }
+    .brand-icon {
+      width:34px;height:34px;border-radius:10px;
+      background:linear-gradient(135deg,#7c3aed,#0ea5e9);
+      display:flex;align-items:center;justify-content:center;
+      font-size:15px;
+      box-shadow:0 4px 14px rgba(124,58,237,0.4);
+    }
+    .brand-name {
+      font-size:17px;font-weight:600;letter-spacing:-0.3px;
+    }
+    .brand-badge {
+      font-family:var(--mono);font-size:9px;
+      color:var(--green);letter-spacing:1px;
+      padding:2px 6px;border:1px solid currentColor;
+      border-radius:4px;opacity:0.8;
+    }
+    .header-right{display:flex;align-items:center;gap:8px}
+
+    /* Stat pills */
+    .stat-pill {
+      display:flex;align-items:center;gap:5px;
+      padding:5px 11px;border-radius:99px;
+      font-size:12px;font-weight:500;
+      background:var(--glass-2);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+    }
+    .stat-val{font-family:var(--mono);font-size:12px}
+
+    /* Icon buttons */
+    .icon-btn {
+      width:34px;height:34px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:14px;color:var(--t2);
+      background:var(--glass-2);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      transition:all 0.2s;cursor:pointer;
+      position:relative;
+    }
+    .icon-btn:hover{color:var(--t1);border-color:var(--border-3)}
+    .icon-btn:active{transform:scale(0.92)}
+
+    /* Lang dropdown */
+    .lang-dropdown {
+      position:absolute;top:calc(100% + 8px);right:0;
+      min-width:155px;
+      background:var(--bg-mid);
+      backdrop-filter:blur(40px);
+      -webkit-backdrop-filter:blur(40px);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      border-radius:var(--r-sm);
+      padding:6px;z-index:200;
+      box-shadow:var(--shadow-lg);
+      display:none;
+    }
+    .lang-dropdown.open{display:block;animation:fadeDown 0.15s ease}
+    .lang-opt {
+      display:flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:8px;
+      cursor:pointer;font-size:13px;transition:background 0.12s;
+    }
+    .lang-opt:hover{background:var(--glass-3)}
+    .lang-opt.active{color:var(--accent)}
+
+    /* Install btn */
+    .install-btn {
+      display:none;align-items:center;gap:6px;
+      padding:6px 13px;border-radius:99px;
+      background:linear-gradient(135deg,#7c3aed,#0ea5e9);
+      color:white;font-size:11px;font-weight:600;
+      box-shadow:0 4px 14px rgba(124,58,237,0.35);
+      transition:all 0.2s;
+    }
+    .install-btn.visible{display:flex}
+    .install-btn:hover{opacity:0.88;transform:scale(1.02)}
+
+    /* User chip */
+    .user-chip {
+      display:flex;align-items:center;gap:7px;
+      padding:4px 10px 4px 4px;border-radius:99px;
+      background:var(--glass-2);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      cursor:pointer;transition:all 0.2s;
+    }
+    .user-chip:hover{border-color:var(--border-3)}
+    .user-avatar {
+      width:26px;height:26px;border-radius:50%;
+      background:linear-gradient(135deg,#7c3aed,#ec4899);
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:700;color:white;
+    }
+    .user-name{font-size:12px;font-weight:500}
+
+    /* ===== MAIN ===== */
+    .main {
+      max-width:1240px;margin:0 auto;
+      padding:clamp(16px,3vw,40px) clamp(14px,3vw,40px) 60px;
+      position:relative;z-index:1;
+    }
+
+    /* ===== CHALLENGE BANNER ===== */
+    .challenge {
+      border-radius:var(--r-lg);
+      padding:18px 22px;
+      margin-bottom:24px;
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      flex-wrap:wrap;
+      background:linear-gradient(135deg,rgba(124,58,237,0.15) 0%,rgba(14,165,233,0.08) 100%);
+      border:1px solid rgba(167,139,250,0.2);
+      border-top-color:rgba(255,255,255,0.12);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      box-shadow:0 0 40px rgba(124,58,237,0.1);
+    }
+    .challenge-left{display:flex;align-items:center;gap:13px}
+    .challenge-icon {
+      width:42px;height:42px;border-radius:12px;
+      background:linear-gradient(135deg,#f59e0b,#f97316);
+      display:flex;align-items:center;justify-content:center;
+      font-size:19px;flex-shrink:0;
+      box-shadow:0 4px 14px rgba(245,158,11,0.35);
+    }
+    .challenge-tag {
+      font-family:var(--mono);font-size:9px;
+      color:var(--accent);letter-spacing:1.5px;
+      margin-bottom:3px;
+    }
+    .challenge-text{font-size:14px;font-weight:500}
+    .challenge-btn {
+      padding:9px 18px;border-radius:99px;
+      background:linear-gradient(135deg,#7c3aed,#0ea5e9);
+      color:white;font-size:12px;font-weight:600;
+      display:flex;align-items:center;gap:7px;
+      box-shadow:0 4px 16px rgba(124,58,237,0.35);
+      transition:all 0.2s;white-space:nowrap;
+    }
+    .challenge-btn:hover{opacity:0.88;transform:scale(1.02)}
+    .challenge-btn:active{transform:scale(0.96)}
+
+    /* ===== GRID ===== */
+    .grid3 {
+      display:grid;
+      grid-template-columns:250px 1fr 250px;
+      gap:16px;align-items:start;
+    }
+    @media(max-width:1060px){.grid3{grid-template-columns:220px 1fr 220px;gap:12px}}
+    @media(max-width:820px){
+      .grid3{grid-template-columns:1fr}
+      .col-left{order:2}.col-center{order:1}.col-right{order:3}
+    }
+    @media(max-width:600px){.stat-pill{display:none}}
+
+    /* ===== GLASS CARD ===== */
+    .card {
+      border-radius:var(--r-lg);
+      background:var(--glass-2);
+      backdrop-filter:blur(28px) saturate(180%);
+      -webkit-backdrop-filter:blur(28px) saturate(180%);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,0.06);
+      padding:18px;
+      transition:border-color 0.2s;
+    }
+    .card+.card{margin-top:12px}
+    .card-label {
+      font-family:var(--mono);font-size:9px;
+      color:var(--t3);letter-spacing:2px;text-transform:uppercase;
+      margin-bottom:12px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .card-label-count{color:var(--accent)}
+
+    /* ===== THEME LIST ===== */
+    .theme-list{display:flex;flex-direction:column;gap:5px;max-height:340px;overflow-y:auto}
+    .theme-item {
+      display:flex;align-items:center;gap:9px;
+      padding:9px 11px;border-radius:var(--r-sm);
+      border:1px solid transparent;
+      cursor:pointer;transition:all 0.16s;
+      background:rgba(255,255,255,0.02);
+    }
+    .theme-item:hover{background:var(--glass-2);border-color:var(--border-2)}
+    .theme-item.active{
+      background:var(--glass-3);
+      border-color:var(--border-3);
+      border-top-color:var(--border-top);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .theme-swatch{
+      width:30px;height:30px;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:13px;
+    }
+    .theme-name{font-size:12px;font-weight:500}
+    .theme-desc{font-size:10px;color:var(--t3)}
+
+    /* ===== ACTION BUTTONS ===== */
+    .action-btn {
+      width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px;border-radius:var(--r-sm);
+      font-size:12px;font-weight:500;
+      background:var(--glass-2);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      color:var(--t1);transition:all 0.16s;
+    }
+    .action-btn+.action-btn{margin-top:5px}
+    .action-btn:hover{background:var(--glass-3);border-color:var(--border-3)}
+    .action-btn:active{transform:scale(0.97)}
+
+    /* ===== PHONE ===== */
+    .phone-wrap{display:flex;flex-direction:column;align-items:center}
+    .preview-bar{
+      display:flex;align-items:center;gap:8px;
+      margin-bottom:14px;flex-wrap:wrap;justify-content:center;
+    }
+    .preview-pill{
+      display:flex;align-items:center;gap:5px;
+      padding:5px 11px;border-radius:99px;font-size:10px;
+      font-family:var(--mono);
+      background:var(--glass-2);border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      color:var(--t2);cursor:pointer;transition:all 0.2s;
+    }
+    .preview-pill:hover{color:var(--t1);border-color:var(--border-3)}
+    .preview-pill .live-dot{
+      width:6px;height:6px;border-radius:50%;
+      background:var(--green);animation:pulse 2s infinite;
+    }
+
+    /* Phone shell */
+    .phone-shell {
+      width:295px;height:610px;
+      background:#050510;
+      border-radius:50px;
+      position:relative;overflow:hidden;
+      box-shadow:
+        0 0 0 9px rgba(255,255,255,0.07),
+        0 0 0 13px rgba(255,255,255,0.03),
+        0 40px 80px rgba(0,0,0,0.7),
+        0 0 60px rgba(124,58,237,0.12);
+      border:1px solid rgba(255,255,255,0.1);
+      transition:box-shadow 0.4s;
+    }
+    .phone-shell:hover{box-shadow:0 0 0 9px rgba(255,255,255,0.09),0 0 0 13px rgba(255,255,255,0.04),0 50px 100px rgba(0,0,0,0.75),0 0 80px rgba(124,58,237,0.18)}
+    .phone-notch{
+      position:absolute;top:10px;left:50%;transform:translateX(-50%);
+      width:105px;height:24px;
+      background:#050510;border-radius:99px;z-index:50;
+      border:1px solid rgba(255,255,255,0.05);
+    }
+    .phone-screen{width:100%;height:100%;position:relative;overflow:hidden}
+    .phone-wallpaper{position:absolute;inset:0;background-size:cover;background-position:center;transition:background 0.5s cubic-bezier(0.23,1,0.32,1)}
+
+    /* Status bar */
+    .phone-status{
+      position:relative;z-index:30;height:40px;
+      padding:0 22px;
+      display:flex;align-items:center;justify-content:space-between;
+      font-size:12px;font-weight:600;color:rgba(255,255,255,0.9);
+    }
+    .phone-status-icons{display:flex;align-items:center;gap:3px;font-size:10px}
+
+    /* Date chip */
+    .phone-date-row{position:relative;z-index:10;padding:4px 18px 0}
+    .phone-date-chip{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:3px 9px;border-radius:99px;
+      font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.6);
+      background:rgba(255,255,255,0.08);
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,0.12);
+    }
+
+    /* Weather widget — liquid glass */
+    .phone-weather{
+      margin:8px 14px 0;padding:10px 14px;
+      display:flex;align-items:center;gap:10px;
+      border-radius:18px;cursor:pointer;
+      background:rgba(255,255,255,0.08);
+      backdrop-filter:blur(20px) saturate(180%);
+      -webkit-backdrop-filter:blur(20px) saturate(180%);
+      border:1px solid rgba(255,255,255,0.14);
+      border-top-color:rgba(255,255,255,0.28);
+      box-shadow:0 4px 20px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.18);
+      transition:transform 0.2s;
+      position:relative;z-index:10;
+    }
+    .phone-weather:active{transform:scale(0.97)}
+    .phone-weather-temp{font-size:30px;font-weight:300;color:white;line-height:1}
+    .phone-weather-info{font-size:9px;color:rgba(255,255,255,0.55);margin-top:1px}
+    .phone-weather-icon{font-size:26px;margin-left:auto}
+
+    /* Icons grid */
+    .phone-icons{
+      display:grid;grid-template-columns:repeat(4,1fr);
+      gap:12px;padding:14px;
+      position:relative;z-index:10;
+    }
+    .phone-icon{
+      display:flex;flex-direction:column;align-items:center;gap:5px;
+      cursor:pointer;
+      transition:transform 0.18s cubic-bezier(0.23,1,0.32,1);
+    }
+    .phone-icon:active{transform:scale(0.88)}
+    .phone-icon-wrap{
+      width:50px;height:50px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;font-size:22px;
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,0.2);
+      border-top-color:rgba(255,255,255,0.4);
+      box-shadow:0 4px 14px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.25);
+      transition:all 0.3s cubic-bezier(0.23,1,0.32,1);
+      position:relative;overflow:hidden;
+    }
+    /* Glass sheen */
+    .phone-icon-wrap::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,0.18) 0%,transparent 50%);
+      border-radius:inherit;pointer-events:none;
+    }
+    .phone-icon-label{
+      font-size:9px;font-weight:500;
+      color:rgba(255,255,255,0.82);
+      text-shadow:0 1px 4px rgba(0,0,0,0.7);
+      text-align:center;max-width:54px;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+
+    /* Dock — liquid glass */
+    .phone-dock{
+      position:absolute;bottom:18px;left:14px;right:14px;
+      padding:9px 12px;border-radius:22px;
+      display:flex;justify-content:center;gap:10px;
+      background:rgba(255,255,255,0.1);
+      backdrop-filter:blur(28px) saturate(200%);
+      -webkit-backdrop-filter:blur(28px) saturate(200%);
+      border:1px solid rgba(255,255,255,0.18);
+      border-top-color:rgba(255,255,255,0.35);
+      box-shadow:0 8px 32px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.2);
+      z-index:20;
+    }
+    .dock-icon{
+      width:44px;height:44px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;cursor:pointer;
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,0.2);
+      border-top-color:rgba(255,255,255,0.35);
+      box-shadow:0 2px 10px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.2);
+      position:relative;overflow:hidden;
+      transition:transform 0.18s;
+    }
+    .dock-icon::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,0.2) 0%,transparent 55%);
+      border-radius:inherit;pointer-events:none;
+    }
+    .dock-icon:active{transform:scale(0.88)}
+
+    /* ===== WALLPAPER GRID ===== */
+    .wp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .wp-thumb{
+      aspect-ratio:9/16;border-radius:var(--r-sm);
+      cursor:pointer;position:relative;overflow:hidden;
+      border:2px solid transparent;transition:all 0.2s;
+    }
+    .wp-thumb:hover{transform:scale(1.04)}
+    .wp-thumb.active{border-color:var(--accent);box-shadow:0 0 14px rgba(167,139,250,0.4)}
+    .wp-thumb-name{
+      position:absolute;bottom:0;inset-x:0;
+      background:linear-gradient(to top,rgba(0,0,0,0.75),transparent);
+      padding:6px 5px 4px;
+      font-size:8px;font-weight:500;color:white;
+    }
+
+    /* ===== SETUP INFO ===== */
+    .setup-row{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:7px 0;border-bottom:1px solid var(--border-1);
+      font-size:12px;
+    }
+    .setup-row:last-child{border-bottom:none}
+    .setup-label{color:var(--t2)}
+    .setup-val{font-family:var(--mono);font-size:11px;font-weight:500}
+
+    /* ===== DNA CARD ===== */
+    .dna-card{
+      border-radius:var(--r-lg);padding:16px;
+      display:flex;align-items:center;gap:11px;
+      cursor:pointer;transition:all 0.2s;
+      background:var(--glass-2);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+    }
+    .dna-card:hover{background:var(--glass-3);border-color:rgba(167,139,250,0.3)}
+    .dna-card:active{transform:scale(0.98)}
+    .dna-icon{
+      width:40px;height:40px;border-radius:12px;flex-shrink:0;
+      background:rgba(167,139,250,0.12);
+      display:flex;align-items:center;justify-content:center;
+      font-size:17px;color:var(--accent);
+    }
+    .dna-title{font-size:13px;font-weight:500;margin-bottom:2px}
+    .dna-sub{font-size:10px;color:var(--t3)}
+
+    /* ===== BOTTOM BAR ===== */
+    .bottom-bar{
+      margin-top:28px;
+      display:flex;align-items:center;justify-content:center;
+      gap:9px;flex-wrap:wrap;
+    }
+    .btn-primary{
+      display:flex;align-items:center;gap:7px;
+      padding:11px 22px;border-radius:99px;
+      background:linear-gradient(135deg,#7c3aed,#0ea5e9);
+      color:white;font-size:13px;font-weight:600;
+      box-shadow:0 6px 20px rgba(124,58,237,0.35);
+      transition:all 0.2s;white-space:nowrap;
+    }
+    .btn-primary:hover{opacity:0.88;transform:scale(1.02)}
+    .btn-primary:active{transform:scale(0.97)}
+    .btn-secondary{
+      display:flex;align-items:center;gap:7px;
+      padding:11px 18px;border-radius:99px;
+      background:var(--glass-2);
+      border:1px solid var(--border-2);
+      border-top-color:var(--border-top);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      font-size:13px;font-weight:500;
+      transition:all 0.2s;white-space:nowrap;
+    }
+    .btn-secondary:hover{background:var(--glass-3);border-color:var(--border-3)}
+    .btn-secondary:active{transform:scale(0.97)}
+    .bottom-note{font-size:10px;color:var(--t3);font-family:var(--mono)}
+
+    /* ===== MODALS ===== */
+    .modal-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,0.6);
+      backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+      z-index:300;align-items:center;justify-content:center;padding:16px;
+    }
+    .modal-overlay.open{display:flex;animation:fadeIn 0.18s ease}
+    .modal-box{
+      background:rgba(12,12,28,0.85);
+      backdrop-filter:blur(48px) saturate(200%);
+      -webkit-backdrop-filter:blur(48px) saturate(200%);
+      border:1px solid var(--border-3);
+      border-top-color:rgba(255,255,255,0.18);
+      border-radius:28px;
+      width:100%;max-width:430px;
+      max-height:88dvh;overflow-y:auto;
+      box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 60px rgba(124,58,237,0.1);
+      animation:slideUp 0.22s cubic-bezier(0.23,1,0.32,1);
+    }
+    .modal-header{
+      padding:20px 22px 14px;
+      display:flex;justify-content:space-between;align-items:flex-start;
+      border-bottom:1px solid var(--border-1);
+    }
+    .modal-title{font-size:19px;font-weight:600;letter-spacing:-0.3px}
+    .modal-sub{font-size:11px;color:var(--t3);margin-top:2px;font-family:var(--mono)}
+    .modal-close{
+      width:30px;height:30px;border-radius:8px;flex-shrink:0;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;color:var(--t2);
+      background:var(--glass-2);border:1px solid var(--border-2);
+      transition:all 0.15s;
+    }
+    .modal-close:hover{color:var(--t1)}
+    .modal-body{padding:18px 22px}
+    .modal-footer{
+      padding:14px 22px;border-top:1px solid var(--border-1);
+      display:flex;justify-content:flex-end;gap:7px;
+    }
+
+    /* Icon picker */
+    .icon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .icon-pick{
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+      padding:9px 5px;border-radius:12px;cursor:pointer;
+      border:1px solid transparent;transition:all 0.14s;
+    }
+    .icon-pick:hover{background:var(--glass-2);border-color:var(--border-2)}
+    .icon-pick.sel{border-color:var(--accent);background:rgba(167,139,250,0.07)}
+    .icon-pick-circle{
+      width:44px;height:44px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;font-size:20px;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,0.15);
+      border-top-color:rgba(255,255,255,0.28);
+    }
+    .icon-pick-label{font-size:9px;color:var(--t2);text-align:center}
+
+    /* Quiz */
+    .quiz-progress{height:2px;background:var(--glass-3);border-radius:99px;overflow:hidden;margin-bottom:20px}
+    .quiz-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#0ea5e9);border-radius:99px;transition:width 0.35s ease}
+    .quiz-q{font-size:19px;font-weight:400;line-height:1.4;margin-bottom:18px;letter-spacing:-0.2px}
+    .quiz-opt{
+      display:flex;align-items:center;gap:11px;
+      padding:12px 14px;border-radius:var(--r-sm);
+      border:1px solid var(--border-2);cursor:pointer;
+      transition:all 0.14s;font-size:13px;margin-bottom:7px;
+      background:rgba(255,255,255,0.02);
+    }
+    .quiz-opt:hover{border-color:var(--border-3);background:var(--glass-2)}
+    .quiz-opt.sel{border-color:var(--accent);background:rgba(167,139,250,0.07)}
+    .quiz-radio{
+      width:17px;height:17px;border-radius:50%;border:1px solid var(--border-3);
+      flex-shrink:0;display:flex;align-items:center;justify-content:center;
+      transition:all 0.14s;
+    }
+    .quiz-opt.sel .quiz-radio{border-color:var(--accent);background:var(--accent)}
+    .quiz-opt.sel .quiz-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:white;display:block}
+
+    /* Saved setups */
+    .setup-item{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:11px 13px;border-radius:var(--r-sm);
+      border:1px solid var(--border-2);cursor:pointer;
+      transition:all 0.14s;gap:9px;margin-bottom:5px;
+      background:rgba(255,255,255,0.02);
+    }
+    .setup-item:hover{background:var(--glass-2);border-color:var(--border-3)}
+
+    /* AI */
+    .ai-bubble{
+      padding:14px 16px;border-radius:var(--r-sm);font-size:13px;line-height:1.65;
+      background:rgba(167,139,250,0.07);
+      border:1px solid rgba(167,139,250,0.18);
+    }
+    .ai-thinking{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--accent)}
+    .ai-spin{width:13px;height:13px;border:2px solid rgba(167,139,250,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+
+    /* ===== TOASTS ===== */
+    #toasts{
+      position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+      z-index:1000;display:flex;flex-direction:column;gap:7px;
+      align-items:center;pointer-events:none;
+    }
+    .toast{
+      padding:9px 17px;
+      background:rgba(20,20,40,0.9);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      border:1px solid var(--border-3);border-top-color:rgba(255,255,255,0.2);
+      border-radius:99px;font-size:12px;white-space:nowrap;
+      box-shadow:var(--shadow-lg);
+      animation:toastIn 0.22s ease,toastOut 0.28s ease 2.2s forwards;
+    }
+
+    /* ===== CONFETTI ===== */
+    .cp{position:fixed;z-index:9999;pointer-events:none;animation:cpFall linear forwards}
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    @keyframes toastOut{from{opacity:1}to{opacity:0}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes cpFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+  </style>
+</head>
+<body>
+<div class="ambient-bg">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="brand" href="#" onclick="return false">
+    <div class="brand-icon">⚙</div>
+    <span class="brand-name">DeviceForge</span>
+    <span class="brand-badge">PWA</span>
+  </a>
+  <div class="header-right">
+    <div class="stat-pill"><i class="fa-solid fa-fire" style="color:#f97316"></i><span class="stat-val" id="sv-streak">7</span><span style="font-size:10px;color:var(--t3)" data-i18n="days"></span></div>
+    <div class="stat-pill"><i class="fa-solid fa-bolt" style="color:#f59e0b"></i><span class="stat-val" id="sv-xp">2480</span><span style="font-size:10px;color:var(--t3)">XP</span></div>
+    <!-- Lang -->
+    <div style="position:relative">
+      <button class="icon-btn" id="lang-btn" onclick="toggleLang()"><span id="lang-flag">🌐</span></button>
+      <div class="lang-dropdown" id="lang-dd">
+        <div class="lang-opt" data-lang="en" onclick="setLang('en')">🇬🇧 English</div>
+        <div class="lang-opt" data-lang="fi" onclick="setLang('fi')">🇫🇮 Suomi</div>
+        <div class="lang-opt" data-lang="sv" onclick="setLang('sv')">🇸🇪 Svenska</div>
+        <div class="lang-opt" data-lang="de" onclick="setLang('de')">🇩🇪 Deutsch</div>
+        <div class="lang-opt" data-lang="es" onclick="setLang('es')">🇪🇸 Español</div>
+        <div class="lang-opt" data-lang="fr" onclick="setLang('fr')">🇫🇷 Français</div>
+        <div class="lang-opt" data-lang="ja" onclick="setLang('ja')">🇯🇵 日本語</div>
+        <div class="lang-opt" data-lang="pt" onclick="setLang('pt')">🇧🇷 Português</div>
+      </div>
+    </div>
+    <button class="icon-btn" onclick="toggleScheme()" title="Toggle theme">
+      <i class="fa-solid fa-circle-half-stroke"></i>
+    </button>
+    <button class="install-btn" id="install-btn" onclick="installPWA()">
+      <i class="fa-solid fa-download"></i><span data-i18n="install"></span>
+    </button>
+    <div class="user-chip" onclick="editName()">
+      <div class="user-avatar" id="u-avatar">N</div>
+      <span class="user-name" id="u-name">Nova</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- Challenge -->
+  <div class="challenge">
+    <div class="challenge-left">
+      <div class="challenge-icon">☀️</div>
+      <div>
+        <div class="challenge-tag" data-i18n="dailyChallenge"></div>
+        <div class="challenge-text" data-i18n="challengeText"></div>
+      </div>
+    </div>
+    <button class="challenge-btn" onclick="completeDailyChallenge()">
+      <span data-i18n="startBuilding"></span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- 3-col -->
+  <div class="grid3">
+
+    <!-- LEFT -->
+    <div class="col-left">
+      <div class="card">
+        <div class="card-label"><span data-i18n="themes"></span><span class="card-label-count" id="theme-count">16</span></div>
+        <div class="theme-list" id="theme-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="quickActions"></div>
+        <button class="action-btn" onclick="randomizeSetup()"><i class="fa-solid fa-shuffle"></i><span data-i18n="randomize"></span></button>
+        <button class="action-btn" onclick="resetToDefault()"><i class="fa-solid fa-rotate-left"></i><span data-i18n="reset"></span></button>
+        <button class="action-btn" onclick="openAI()"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent)"></i><span data-i18n="aiAdvisor"></span></button>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="col-center">
+      <div class="phone-wrap">
+        <div class="preview-bar">
+          <div class="preview-pill"><div class="live-dot"></div>LIVE PREVIEW</div>
+          <div class="preview-pill" onclick="shareSetup()"><i class="fa-solid fa-share-nodes"></i><span data-i18n="share"></span></div>
+          <div class="preview-pill" onclick="capturePreview()"><i class="fa-solid fa-download"></i><span data-i18n="saveImage"></span></div>
+        </div>
+        <div class="phone-shell" id="phone-shell">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-wallpaper" id="phone-wp"></div>
+            <div class="phone-status">
+              <span id="p-time">9:41</span>
+              <div class="phone-status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <span style="font-family:var(--mono);font-size:9px">100%</span>
+              </div>
+            </div>
+            <div class="phone-date-row">
+              <div class="phone-date-chip"><i class="fa-regular fa-calendar" style="font-size:8px"></i><span id="p-date">SAT 30.5</span></div>
+            </div>
+            <div class="phone-weather" onclick="openModal('weather-modal')">
+              <div>
+                <div class="phone-weather-temp">18°</div>
+                <div class="phone-weather-info">Helsinki · <span data-i18n="cloudy"></span></div>
+              </div>
+              <div class="phone-weather-icon">⛅</div>
+            </div>
+            <div class="phone-icons" id="icons-grid"></div>
+            <div class="phone-dock" id="phone-dock"></div>
+          </div>
+        </div>
+        <div style="margin-top:9px;text-align:center;font-size:10px;color:var(--t3)"><span data-i18n="tapToChange"></span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-right">
+      <div class="card">
+        <div class="card-label" data-i18n="currentSetup"></div>
+        <div id="setup-info"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">
+          <span data-i18n="wallpapers"></span>
+          <button onclick="showAllWp()" style="font-size:10px;color:var(--t3);font-family:var(--mono);cursor:pointer" data-i18n="viewAll"></button>
+        </div>
+        <div class="wp-grid" id="wp-grid"></div>
+      </div>
+      <div class="dna-card" onclick="openQuiz()">
+        <div class="dna-icon"><i class="fa-solid fa-dna"></i></div>
+        <div class="flex-1">
+          <div class="dna-title" data-i18n="styleDna"></div>
+          <div class="dna-sub" data-i18n="styleDnaSub"></div>
+        </div>
+        <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:var(--t3);font-size:11px"></i>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom -->
+  <div class="bottom-bar">
+    <button class="btn-primary" onclick="saveSetup()"><i class="fa-solid fa-floppy-disk"></i><span data-i18n="saveSetup"></span></button>
+    <button class="btn-secondary" onclick="showSaved()"><i class="fa-solid fa-folder-open"></i><span data-i18n="mySetups"></span></button>
+    <span class="bottom-note" data-i18n="pwaBadge"></span>
+  </div>
+
+</main>
+
+<!-- MODALS -->
+
+<!-- Icon Picker -->
+<div class="modal-overlay" id="icon-modal">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div><div class="modal-title" data-i18n="changeIcon"></div><div class="modal-sub" id="icon-sub"></div></div>
+      <button class="modal-close" onclick="closeModal('icon-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body"><div class="icon-grid" id="icon-grid"></div></div>
+    <div class="modal-footer"><button class="btn-secondary" style="padding:7px 14px;font-size:12px" onclick="closeModal('icon-modal')" data-i18n="cancel"></button></div>
+  </div>
+</div>
+
+<!-- Quiz -->
+<div class="modal-overlay" id="quiz-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px">
+    <div class="modal-header">
+      <div><div class="modal-title" style="font-style:italic">Style DNA</div><div class="modal-sub" data-i18n="personalityTest"></div></div>
+      <button class="modal-close" onclick="closeModal('quiz-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="quiz-body"></div>
+    <div class="modal-footer" id="quiz-footer" style="justify-content:space-between">
+      <button class="btn-secondary" style="padding:7px 14px;font-size:12px" id="quiz-prev" onclick="prevQ()"><i class="fa-solid fa-chevron-left"></i></button>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--t3)" id="quiz-prog">1 / 6</span>
+      <button class="btn-primary" style="padding:7px 14px;font-size:12px" id="quiz-next" onclick="nextQ()"><span id="quiz-next-txt" data-i18n="next"></span> <i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- All Wallpapers -->
+<div class="modal-overlay" id="wp-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="allWallpapers"></div>
+      <button class="modal-close" onclick="closeModal('wp-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="all-wp" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Saved -->
+<div class="modal-overlay" id="saved-modal">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="savedSetups"></div>
+      <button class="modal-close" onclick="closeModal('saved-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="saved-list"></div>
+  </div>
+</div>
+
+<!-- AI -->
+<div class="modal-overlay" id="ai-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:460px">
+    <div class="modal-header">
+      <div><div class="modal-title">AI Advisor</div><div class="modal-sub">Powered by Claude</div></div>
+      <button class="modal-close" onclick="closeModal('ai-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="ai-body"></div>
+  </div>
+</div>
+
+<!-- Weather -->
+<div class="modal-overlay" id="weather-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:300px">
+    <div class="modal-header">
+      <div class="modal-title">⛅ Helsinki</div>
+      <button class="modal-close" onclick="closeModal('weather-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <div style="font-size:64px;margin-bottom:4px">⛅</div>
+      <div style="font-size:48px;font-weight:300">18°C</div>
+      <div style="color:var(--t2);margin-bottom:18px" data-i18n="cloudy"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+        <div style="background:var(--glass-2);border:1px solid var(--border-2);border-radius:12px;padding:11px">
+          <div style="font-size:9px;color:var(--t3);margin-bottom:3px" data-i18n="today"></div>
+          <div style="font-family:var(--mono);font-size:12px">19° / 12°</div>
+        </div>
+        <div style="background:var(--glass-2);border:1px solid var(--border-2);border-radius:12px;padding:11px">
+          <div style="font-size:9px;color:var(--t3);margin-bottom:3px" data-i18n="tomorrow"></div>
+          <div style="font-family:var(--mono);font-size:12px">21° / 9°</div>
+        </div>
+        <div style="background:var(--glass-2);border:1px solid var(--border-2);border-radius:12px;padding:11px">
+          <div style="font-size:9px;color:var(--t3);margin-bottom:3px" data-i18n="friday"></div>
+          <div style="font-family:var(--mono);font-size:12px">23° / 14°</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+// ============================================================
+// TRANSLATIONS
+// ============================================================
+const i18n={
+  en:{days:'days',install:'Install',dailyChallenge:'DAILY CHALLENGE',challengeText:'Build a "Quiet Luxury" screen — max 4 icons, brass palette',startBuilding:'Start Building',themes:'THEMES',quickActions:'QUICK ACTIONS',randomize:'Randomize',reset:'Reset Defaults',aiAdvisor:'AI Advisor',saveImage:'Save',share:'Share',tapToChange:'Tap an icon to change it',currentSetup:'CURRENT SETUP',wallpapers:'WALLPAPERS',viewAll:'All →',styleDna:'Discover Your Style DNA',styleDnaSub:'60-second personality test',saveSetup:'Save Setup',mySetups:'My Setups',pwaBadge:'Full PWA · Offline · Installable',changeIcon:'Change Icon',cancel:'Cancel',personalityTest:'PERSONALITY TEST',next:'Next',finish:'Show Result',allWallpapers:'All Wallpapers',savedSetups:'Saved Setups',theme:'Theme',wallpaper:'Wallpaper',icons:'Icons',cloudy:'Cloudy',today:'Today',tomorrow:'Tomorrow',friday:'Fri',noSetups:'No saved setups yet.',setupSaved:'Setup saved!',setupLoaded:'Setup loaded!',randomized:'Randomized ✨',resetDone:'Reset to defaults',challengeDone:'Challenge done! +120 XP 🎉',installTip:'iOS: Share → "Add to Home Screen". Android: browser menu',aiThinking:'Analyzing your style…',enterName:"What's your name?",saveSetupName:'Name this setup:',selectOption:'Select an option first',quizDone:'Quiz done! +95 XP',applyTheme:'Apply Theme',noThanks:'No Thanks',yourStyleIs:'Your style is'},
+  fi:{days:'päivää',install:'Asenna',dailyChallenge:'PÄIVÄN HAASTE',challengeText:'Rakenna "Quiet Luxury" -näyttö — max 4 ikonia, messinki',startBuilding:'Aloita',themes:'TEEMAT',quickActions:'PIKATOIMINNOT',randomize:'Satunnaista',reset:'Palauta oletus',aiAdvisor:'AI-tyyliopas',saveImage:'Tallenna',share:'Jaa',tapToChange:'Kosketa ikonia vaihtaaksesi',currentSetup:'NYKYINEN ASETUS',wallpapers:'TAUSTAKUVAT',viewAll:'Kaikki →',styleDna:'Löydä tyylisi DNA',styleDnaSub:'60 sekunnin persoonallisuustesti',saveSetup:'Tallenna asetus',mySetups:'Omat asetukset',pwaBadge:'Täysi PWA · Offline · Asennettavissa',changeIcon:'Vaihda ikoni',cancel:'Peruuta',personalityTest:'PERSOONALLISUUSTESTI',next:'Seuraava',finish:'Näytä tulos',allWallpapers:'Kaikki taustakuvat',savedSetups:'Tallennetut asetukset',theme:'Teema',wallpaper:'Tausta',icons:'Ikonit',cloudy:'Pilvinen',today:'Tänään',tomorrow:'Huomenna',friday:'Pe',noSetups:'Ei tallennettuja asetuksia.',setupSaved:'Asetus tallennettu!',setupLoaded:'Asetus ladattu!',randomized:'Satunnaistettu ✨',resetDone:'Palautettu oletuksiin',challengeDone:'Haaste suoritettu! +120 XP 🎉',installTip:'iOS: Jaa → "Lisää aloitusnäyttöön". Android: selainvalikosta',aiThinking:'Analysoidaan tyyliäsi…',enterName:'Mikä on nimesi?',saveSetupName:'Anna asetukselle nimi:',selectOption:'Valitse ensin vaihtoehto',quizDone:'Kysely valmis! +95 XP',applyTheme:'Ota käyttöön',noThanks:'Ei kiitos',yourStyleIs:'Tyylisi on'},
+  sv:{days:'dagar',install:'Installera',dailyChallenge:'DAGENS UTMANING',challengeText:'Bygg en "Quiet Luxury"-skärm — max 4 ikoner',startBuilding:'Börja bygga',themes:'TEMAN',quickActions:'SNABBÅTGÄRDER',randomize:'Slumpa',reset:'Återställ',aiAdvisor:'AI-rådgivare',saveImage:'Spara',share:'Dela',tapToChange:'Tryck på en ikon för att ändra',currentSetup:'NUVARANDE INSTÄLLNING',wallpapers:'BAKGRUNDER',viewAll:'Alla →',styleDna:'Hitta ditt stil-DNA',styleDnaSub:'60 sekunders test',saveSetup:'Spara inställning',mySetups:'Mina inställningar',pwaBadge:'Full PWA · Offline · Installerbar',changeIcon:'Byt ikon',cancel:'Avbryt',personalityTest:'PERSONLIGHETSTEST',next:'Nästa',finish:'Visa resultat',allWallpapers:'Alla bakgrunder',savedSetups:'Sparade inställningar',theme:'Tema',wallpaper:'Bakgrund',icons:'Ikoner',cloudy:'Molnigt',today:'Idag',tomorrow:'Imorgon',friday:'Fre',noSetups:'Inga sparade inställningar.',setupSaved:'Inställning sparad!',setupLoaded:'Inställning laddad!',randomized:'Slumpad ✨',resetDone:'Återställd',challengeDone:'Klar! +120 XP 🎉',installTip:'iOS: Dela → "Lägg till på hemskärm"',aiThinking:'Analyserar…',enterName:'Vad heter du?',saveSetupName:'Namnge inställning:',selectOption:'Välj ett alternativ',quizDone:'Klar! +95 XP',applyTheme:'Tillämpa',noThanks:'Nej tack',yourStyleIs:'Din stil är'},
+  de:{days:'Tage',install:'Installieren',dailyChallenge:'TÄGLICHE AUFGABE',challengeText:'"Quiet Luxury"-Bildschirm — max 4 Icons',startBuilding:'Starten',themes:'THEMEN',quickActions:'SCHNELLAKTIONEN',randomize:'Zufällig',reset:'Zurücksetzen',aiAdvisor:'KI-Berater',saveImage:'Speichern',share:'Teilen',tapToChange:'Icon antippen zum Ändern',currentSetup:'AKTUELLE EINSTELLUNG',wallpapers:'HINTERGRÜNDE',viewAll:'Alle →',styleDna:'Entdecke dein Stil-DNA',styleDnaSub:'60-Sekunden-Test',saveSetup:'Speichern',mySetups:'Meine Einstellungen',pwaBadge:'PWA · Offline · Installierbar',changeIcon:'Icon ändern',cancel:'Abbrechen',personalityTest:'PERSÖNLICHKEITSTEST',next:'Weiter',finish:'Ergebnis',allWallpapers:'Alle Hintergründe',savedSetups:'Gespeicherte Einstellungen',theme:'Thema',wallpaper:'Hintergrund',icons:'Icons',cloudy:'Bewölkt',today:'Heute',tomorrow:'Morgen',friday:'Fr.',noSetups:'Keine gespeicherten Einstellungen.',setupSaved:'Gespeichert!',setupLoaded:'Geladen!',randomized:'Zufällig ✨',resetDone:'Zurückgesetzt',challengeDone:'Fertig! +120 XP 🎉',installTip:'iOS: Teilen → "Zum Home"',aiThinking:'Analysiert…',enterName:'Wie heißt du?',saveSetupName:'Einstellung benennen:',selectOption:'Bitte Option wählen',quizDone:'Fertig! +95 XP',applyTheme:'Anwenden',noThanks:'Nein danke',yourStyleIs:'Dein Stil ist'},
+  es:{days:'días',install:'Instalar',dailyChallenge:'RETO DIARIO',challengeText:'Crea una pantalla "Quiet Luxury" — max 4 iconos',startBuilding:'Empezar',themes:'TEMAS',quickActions:'ACCIONES RÁPIDAS',randomize:'Aleatorizar',reset:'Restablecer',aiAdvisor:'Asesor IA',saveImage:'Guardar',share:'Compartir',tapToChange:'Toca un icono para cambiarlo',currentSetup:'CONFIGURACIÓN',wallpapers:'FONDOS',viewAll:'Ver todo →',styleDna:'Descubre tu ADN de estilo',styleDnaSub:'Test de 60 segundos',saveSetup:'Guardar',mySetups:'Mis configs.',pwaBadge:'PWA · Offline · Instalable',changeIcon:'Cambiar icono',cancel:'Cancelar',personalityTest:'TEST DE PERSONALIDAD',next:'Siguiente',finish:'Ver resultado',allWallpapers:'Todos los fondos',savedSetups:'Configs. guardadas',theme:'Tema',wallpaper:'Fondo',icons:'Iconos',cloudy:'Nublado',today:'Hoy',tomorrow:'Mañana',friday:'Vie',noSetups:'Sin configs. guardadas.',setupSaved:'¡Guardado!',setupLoaded:'¡Cargado!',randomized:'Aleatorizado ✨',resetDone:'Restablecido',challengeDone:'¡Hecho! +120 XP 🎉',installTip:'iOS: Compartir → "Pantalla de inicio"',aiThinking:'Analizando…',enterName:'¿Tu nombre?',saveSetupName:'Nombre:',selectOption:'Selecciona una opción',quizDone:'¡Listo! +95 XP',applyTheme:'Aplicar',noThanks:'No gracias',yourStyleIs:'Tu estilo es'},
+  fr:{days:'jours',install:'Installer',dailyChallenge:'DÉFI DU JOUR',challengeText:'Créez un écran "Quiet Luxury" — max 4 icônes',startBuilding:'Commencer',themes:'THÈMES',quickActions:'ACTIONS RAPIDES',randomize:'Aléatoire',reset:'Réinitialiser',aiAdvisor:'Conseiller IA',saveImage:'Sauvegarder',share:'Partager',tapToChange:'Touchez une icône pour changer',currentSetup:'CONFIGURATION',wallpapers:"FONDS D'ÉCRAN",viewAll:'Tout voir →',styleDna:'Découvrez votre ADN de style',styleDnaSub:'Test de 60 secondes',saveSetup:'Sauvegarder',mySetups:'Mes configs.',pwaBadge:'PWA · Hors ligne · Installable',changeIcon:"Changer l'icône",cancel:'Annuler',personalityTest:'TEST DE PERSONNALITÉ',next:'Suivant',finish:'Résultat',allWallpapers:'Tous les fonds',savedSetups:'Configs. sauvegardées',theme:'Thème',wallpaper:"Fond d'écran",icons:'Icônes',cloudy:'Nuageux',today:"Aujourd'hui",tomorrow:'Demain',friday:'Ven',noSetups:'Pas de configs. sauvegardées.',setupSaved:'Sauvegardé !',setupLoaded:'Chargé !',randomized:'Aléatoire ✨',resetDone:'Réinitialisé',challengeDone:'Fait ! +120 XP 🎉',installTip:'iOS: Partager → "Sur l\'écran d\'accueil"',aiThinking:'Analyse…',enterName:'Votre prénom ?',saveSetupName:'Nommer la config :',selectOption:'Choisissez une option',quizDone:'Terminé ! +95 XP',applyTheme:'Appliquer',noThanks:'Non merci',yourStyleIs:'Votre style est'},
+  ja:{days:'日',install:'インストール',dailyChallenge:'デイリーチャレンジ',challengeText:'「Quiet Luxury」画面を作ろう（最大4アイコン）',startBuilding:'始める',themes:'テーマ',quickActions:'クイックアクション',randomize:'ランダム化',reset:'リセット',aiAdvisor:'AIアドバイザー',saveImage:'保存',share:'共有',tapToChange:'アイコンをタップして変更',currentSetup:'現在の設定',wallpapers:'壁紙',viewAll:'すべて →',styleDna:'スタイルDNAを発見',styleDnaSub:'60秒テスト',saveSetup:'保存',mySetups:'マイ設定',pwaBadge:'PWA · オフライン · インストール可',changeIcon:'アイコン変更',cancel:'キャンセル',personalityTest:'パーソナリティテスト',next:'次へ',finish:'結果を見る',allWallpapers:'すべての壁紙',savedSetups:'保存した設定',theme:'テーマ',wallpaper:'壁紙',icons:'アイコン',cloudy:'曇り',today:'今日',tomorrow:'明日',friday:'金',noSetups:'保存した設定はありません。',setupSaved:'保存しました！',setupLoaded:'読み込みました！',randomized:'ランダム化 ✨',resetDone:'リセットしました',challengeDone:'完了！+120 XP 🎉',installTip:'iOS: 共有 → 「ホーム画面に追加」',aiThinking:'スタイルを分析中…',enterName:'お名前は？',saveSetupName:'設定名：',selectOption:'オプションを選択してください',quizDone:'完了！+95 XP',applyTheme:'適用',noThanks:'いいえ',yourStyleIs:'あなたのスタイルは'},
+  pt:{days:'dias',install:'Instalar',dailyChallenge:'DESAFIO DIÁRIO',challengeText:'Crie uma tela "Quiet Luxury" — max 4 ícones',startBuilding:'Começar',themes:'TEMAS',quickActions:'AÇÕES RÁPIDAS',randomize:'Aleatorizar',reset:'Restaurar',aiAdvisor:'Consultor IA',saveImage:'Salvar',share:'Compartilhar',tapToChange:'Toque num ícone para mudar',currentSetup:'CONFIGURAÇÃO ATUAL',wallpapers:'PAPÉIS DE PAREDE',viewAll:'Ver tudo →',styleDna:'Descubra seu DNA de estilo',styleDnaSub:'Teste de 60 segundos',saveSetup:'Salvar',mySetups:'Minhas configs.',pwaBadge:'PWA · Offline · Instalável',changeIcon:'Mudar ícone',cancel:'Cancelar',personalityTest:'TESTE DE PERSONALIDADE',next:'Próximo',finish:'Ver resultado',allWallpapers:'Todos os fundos',savedSetups:'Configs. salvas',theme:'Tema',wallpaper:'Papel de parede',icons:'Ícones',cloudy:'Nublado',today:'Hoje',tomorrow:'Amanhã',friday:'Sex',noSetups:'Nenhuma config. salva.',setupSaved:'Salvo!',setupLoaded:'Carregado!',randomized:'Aleatorizado ✨',resetDone:'Restaurado',challengeDone:'Feito! +120 XP 🎉',installTip:'iOS: Compartilhar → "Adicionar à Tela Inicial"',aiThinking:'Analisando…',enterName:'Qual é o seu nome?',saveSetupName:'Nome da config:',selectOption:'Selecione uma opção',quizDone:'Concluído! +95 XP',applyTheme:'Aplicar tema',noThanks:'Não obrigado',yourStyleIs:'Seu estilo é'}
+};
+const langFlags={en:'🇬🇧',fi:'🇫🇮',sv:'🇸🇪',de:'🇩🇪',es:'🇪🇸',fr:'🇫🇷',ja:'🇯🇵',pt:'🇧🇷'};
+let lang='en';
+function t(k){return(i18n[lang]||i18n.en)[k]||i18n.en[k]||k}
+function applyTrans(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.getElementById('lang-flag').textContent=langFlags[lang];
+  document.querySelectorAll('.lang-opt').forEach(el=>el.classList.toggle('active',el.dataset.lang===lang));
+}
+function setLang(l){lang=l;document.documentElement.lang=l;localStorage.setItem('df_lang',l);applyTrans();renderAll();closeLang()}
+function toggleLang(){document.getElementById('lang-dd').classList.toggle('open')}
+function closeLang(){document.getElementById('lang-dd').classList.remove('open')}
+document.addEventListener('click',e=>{if(!e.target.closest('#lang-btn')&&!e.target.closest('#lang-dd'))closeLang()});
+
+// ============================================================
+// DATA
+// ============================================================
+const themes=[
+  {id:'luxury',    name:'Quiet Luxury', icon:'fa-gem',            color:'#c8b67a',desc:'Brass & ivory'},
+  {id:'minimal',   name:'Minimal',      icon:'fa-minus',          color:'#888899',desc:'Pure & calm'},
+  {id:'dark',      name:'Dark Mode',    icon:'fa-moon',           color:'#5b5b7a',desc:'Deep black'},
+  {id:'cyberpunk', name:'Cyberpunk',    icon:'fa-robot',          color:'#22d3ee',desc:'Neon & magenta'},
+  {id:'glass',     name:'Glass',        icon:'fa-window-maximize',color:'#bae6fd',desc:'Frosted pane'},
+  {id:'y2k',       name:'Y2K',          icon:'fa-globe',          color:'#f472b6',desc:'Metal & pink'},
+  {id:'clean',     name:'Clean',        icon:'fa-leaf',           color:'#86efac',desc:'Fresh & light'},
+  {id:'warm',      name:'Warm Minimal', icon:'fa-sun',            color:'#fb923c',desc:'Warm beige'},
+  {id:'neon',      name:'Neon Pulse',   icon:'fa-bolt',           color:'#ff00ff',desc:'Electric & vivid'},
+  {id:'marble',    name:'Marble',       icon:'fa-circle',         color:'#d4cfc9',desc:'Stone & elegant'},
+  {id:'sakura',    name:'Sakura',       icon:'fa-pagelines',      color:'#ffb7c5',desc:'Cherry blossom'},
+  {id:'arctic',    name:'Arctic',       icon:'fa-snowflake',      color:'#a8d8ea',desc:'Icy & crisp'},
+  {id:'brutalist', name:'Brutalist',    icon:'fa-square',         color:'#e8e800',desc:'Raw & bold'},
+  {id:'cottagecore',name:'Cottagecore', icon:'fa-seedling',       color:'#a3b899',desc:'Nature & cozy'},
+  {id:'midnight',  name:'Midnight',     icon:'fa-star',           color:'#7c6af5',desc:'Deep violet'},
+  {id:'desert',    name:'Desert Sand',  icon:'fa-sun',            color:'#d4956a',desc:'Warm terracotta'}
+];
+
+const wallpapers=[
+  {id:0, name:'Aurora',      css:'linear-gradient(135deg,#0f172a 0%,#1e3a8a 40%,#312e81 100%)'},
+  {id:1, name:'Liquid',      css:'linear-gradient(160deg,#164e63 0%,#0e7490 50%,#155e75 100%)'},
+  {id:2, name:'Nocturne',    css:'linear-gradient(145deg,#111827 0%,#1e2937 100%)'},
+  {id:3, name:'Prism',       css:'linear-gradient(120deg,#312e81 0%,#581c87 50%,#831843 100%)'},
+  {id:4, name:'Vapor',       css:'linear-gradient(135deg,#1e2937 0%,#334155 100%)'},
+  {id:5, name:'Halo',        css:'linear-gradient(155deg,#1e3a8a 0%,#312e81 70%,#4c1d95 100%)'},
+  {id:6, name:'Drift',       css:'linear-gradient(140deg,#134e4b 0%,#0f766e 60%,#115e59 100%)'},
+  {id:7, name:'Glow',        css:'linear-gradient(130deg,#713f12 0%,#854d0e 50%,#713f12 100%)'},
+  {id:8, name:'Frost',       css:'linear-gradient(150deg,#0c4a6e 0%,#164e63 100%)'},
+  {id:9, name:'Ember',       css:'linear-gradient(120deg,#431407 0%,#78350f 100%)'},
+  {id:10,name:'Ocean',       css:'linear-gradient(145deg,#0e7490 0%,#164e63 100%)'},
+  {id:11,name:'Void',        css:'linear-gradient(180deg,#09090b 0%,#18181b 100%)'},
+  {id:12,name:'Neon City',   css:'linear-gradient(135deg,#0d0014 0%,#1a0030 50%,#0d0020 100%)'},
+  {id:13,name:'Neon Sunset', css:'linear-gradient(160deg,#0a0010 0%,#2d0050 40%,#1a0030 100%)'},
+  {id:14,name:'Electric',    css:'linear-gradient(120deg,#000814 0%,#001233 50%,#0077b6 100%)'},
+  {id:15,name:'Plasma',      css:'linear-gradient(135deg,#10002b 0%,#3c096c 50%,#240046 100%)'},
+  {id:16,name:'Marble White',css:'linear-gradient(135deg,#f5f5f0 0%,#e8e4df 30%,#f0ede8 60%,#ddd8d0 100%)'},
+  {id:17,name:'Marble Dark', css:'linear-gradient(145deg,#1a1a1a 0%,#2d2d2d 40%,#1f1f1f 100%)'},
+  {id:18,name:'Marble Rose', css:'linear-gradient(135deg,#f8e8e8 0%,#ead5d5 40%,#e8d0d0 100%)'},
+  {id:19,name:'Sakura',      css:'linear-gradient(145deg,#1a0a12 0%,#2d1020 50%,#1a0a12 100%)'},
+  {id:20,name:'Arctic',      css:'linear-gradient(155deg,#e8f4fd 0%,#c9e8f5 40%,#a8d8ea 100%)'},
+  {id:21,name:'Desert',      css:'linear-gradient(135deg,#2c1a0e 0%,#5c3a1e 50%,#2c1a0e 100%)'},
+  {id:22,name:'Midnight',    css:'linear-gradient(145deg,#0a0818 0%,#1a1035 50%,#0f0a24 100%)'},
+  {id:23,name:'Cottagecore', css:'linear-gradient(135deg,#1a2412 0%,#2d3d20 50%,#3d5030 100%)'}
+];
+
+const iconLib=[
+  {emoji:'✉️',label:{en:'Messages',fi:'Viestit',sv:'Meddelanden',de:'Nachrichten',es:'Mensajes',fr:'Messages',ja:'メッセージ',pt:'Mensagens'},color:'#3b82f6'},
+  {emoji:'📷',label:{en:'Camera',fi:'Kamera',sv:'Kamera',de:'Kamera',es:'Cámara',fr:'Photo',ja:'カメラ',pt:'Câmera'},color:'#10b981'},
+  {emoji:'🎵',label:{en:'Music',fi:'Musiikki',sv:'Musik',de:'Musik',es:'Música',fr:'Musique',ja:'音楽',pt:'Música'},color:'#8b5cf6'},
+  {emoji:'🗺️',label:{en:'Maps',fi:'Kartat',sv:'Kartor',de:'Karten',es:'Mapas',fr:'Plans',ja:'マップ',pt:'Mapas'},color:'#f59e0b'},
+  {emoji:'🖼️',label:{en:'Photos',fi:'Kuvat',sv:'Foton',de:'Fotos',es:'Fotos',fr:'Photos',ja:'写真',pt:'Fotos'},color:'#ec4899'},
+  {emoji:'📝',label:{en:'Notes',fi:'Muistiinpanot',sv:'Anteckn.',de:'Notizen',es:'Notas',fr:'Notes',ja:'メモ',pt:'Notas'},color:'#eab308'},
+  {emoji:'⏰',label:{en:'Clock',fi:'Kello',sv:'Klocka',de:'Uhr',es:'Reloj',fr:'Horloge',ja:'時計',pt:'Relógio'},color:'#14b8a6'},
+  {emoji:'👛',label:{en:'Wallet',fi:'Lompakko',sv:'Plånbok',de:'Geldbörse',es:'Cartera',fr:'Portefeuille',ja:'財布',pt:'Carteira'},color:'#6366f1'},
+  {emoji:'📱',label:{en:'Phone',fi:'Puhelin',sv:'Telefon',de:'Telefon',es:'Teléfono',fr:'Téléphone',ja:'電話',pt:'Telefone'},color:'#64748b'},
+  {emoji:'💬',label:{en:'Chat',fi:'Chat',sv:'Chatt',de:'Chat',es:'Chat',fr:'Tchat',ja:'チャット',pt:'Chat'},color:'#22d3ee'},
+  {emoji:'🌤️',label:{en:'Weather',fi:'Sää',sv:'Väder',de:'Wetter',es:'Clima',fr:'Météo',ja:'天気',pt:'Clima'},color:'#fbbf24'},
+  {emoji:'📅',label:{en:'Calendar',fi:'Kalenteri',sv:'Kalender',de:'Kalender',es:'Calendario',fr:'Calendrier',ja:'カレンダー',pt:'Calendário'},color:'#f43f5e'},
+  {emoji:'🔍',label:{en:'Search',fi:'Haku',sv:'Sök',de:'Suche',es:'Buscar',fr:'Recherche',ja:'検索',pt:'Busca'},color:'#a78bfa'},
+  {emoji:'⚙️',label:{en:'Settings',fi:'Asetukset',sv:'Inställn.',de:'Einstellungen',es:'Ajustes',fr:'Paramètres',ja:'設定',pt:'Configurações'},color:'#64748b'},
+  {emoji:'❤️',label:{en:'Health',fi:'Terveys',sv:'Hälsa',de:'Gesundheit',es:'Salud',fr:'Santé',ja:'健康',pt:'Saúde'},color:'#f43f5e'},
+  {emoji:'🎮',label:{en:'Games',fi:'Pelit',sv:'Spel',de:'Spiele',es:'Juegos',fr:'Jeux',ja:'ゲーム',pt:'Jogos'},color:'#c026d3'},
+  {emoji:'📚',label:{en:'Books',fi:'Kirjat',sv:'Böcker',de:'Bücher',es:'Libros',fr:'Livres',ja:'本',pt:'Livros'},color:'#0ea5e9'},
+  {emoji:'✈️',label:{en:'Travel',fi:'Matkailu',sv:'Resor',de:'Reisen',es:'Viajes',fr:'Voyage',ja:'旅行',pt:'Viagem'},color:'#06b67f'},
+  {emoji:'🏋️',label:{en:'Fitness',fi:'Liikunta',sv:'Fitness',de:'Fitness',es:'Fitness',fr:'Fitness',ja:'フィットネス',pt:'Fitness'},color:'#f97316'},
+  {emoji:'🍎',label:{en:'Food',fi:'Ruoka',sv:'Mat',de:'Essen',es:'Comida',fr:'Nourriture',ja:'食べ物',pt:'Comida'},color:'#ef4444'},
+  {emoji:'🛍️',label:{en:'Shopping',fi:'Ostokset',sv:'Shopping',de:'Einkaufen',es:'Compras',fr:'Shopping',ja:'ショッピング',pt:'Compras'},color:'#f472b6'},
+  {emoji:'🎨',label:{en:'Art',fi:'Taide',sv:'Konst',de:'Kunst',es:'Arte',fr:'Art',ja:'アート',pt:'Arte'},color:'#e879f9'},
+  {emoji:'💰',label:{en:'Finance',fi:'Raha',sv:'Ekonomi',de:'Finanzen',es:'Finanzas',fr:'Finances',ja:'お金',pt:'Finanças'},color:'#22c55e'},
+  {emoji:'🎬',label:{en:'Video',fi:'Video',sv:'Video',de:'Video',es:'Video',fr:'Vidéo',ja:'動画',pt:'Vídeo'},color:'#ef4444'},
+  {emoji:'📡',label:{en:'Podcast',fi:'Podcast',sv:'Podcast',de:'Podcast',es:'Podcast',fr:'Podcast',ja:'ポッドキャスト',pt:'Podcast'},color:'#8b5cf6'},
+  {emoji:'🔔',label:{en:'Alerts',fi:'Hälytykset',sv:'Aviseringar',de:'Benachricht.',es:'Alertas',fr:'Alertes',ja:'通知',pt:'Alertas'},color:'#f59e0b'},
+  {emoji:'🌙',label:{en:'Sleep',fi:'Uni',sv:'Sömn',de:'Schlaf',es:'Sueño',fr:'Sommeil',ja:'睡眠',pt:'Sono'},color:'#6366f1'},
+  {emoji:'🧘',label:{en:'Mindful',fi:'Mindfulness',sv:'Mindfulness',de:'Achtsamkeit',es:'Mindfulness',fr:'Pleine conscience',ja:'瞑想',pt:'Mindfulness'},color:'#14b8a6'},
+  {emoji:'🚀',label:{en:'Launch',fi:'Käynnistä',sv:'Starta',de:'Start',es:'Lanzar',fr:'Lancer',ja:'起動',pt:'Lançar'},color:'#f97316'},
+  {emoji:'💡',label:{en:'Ideas',fi:'Ideat',sv:'Idéer',de:'Ideen',es:'Ideas',fr:'Idées',ja:'アイデア',pt:'Ideias'},color:'#fbbf24'},
+  {emoji:'🔐',label:{en:'Security',fi:'Turvallisuus',sv:'Säkerhet',de:'Sicherheit',es:'Seguridad',fr:'Sécurité',ja:'セキュリティ',pt:'Segurança'},color:'#10b981'},
+  {emoji:'☁️',label:{en:'Cloud',fi:'Pilvi',sv:'Moln',de:'Cloud',es:'Nube',fr:'Nuage',ja:'クラウド',pt:'Nuvem'},color:'#38bdf8'},
+  {emoji:'🎯',label:{en:'Goals',fi:'Tavoitteet',sv:'Mål',de:'Ziele',es:'Metas',fr:'Objectifs',ja:'目標',pt:'Metas'},color:'#f43f5e'},
+  {emoji:'🌿',label:{en:'Nature',fi:'Luonto',sv:'Natur',de:'Natur',es:'Naturaleza',fr:'Nature',ja:'自然',pt:'Natureza'},color:'#4ade80'},
+  {emoji:'🎭',label:{en:'Events',fi:'Tapahtumat',sv:'Evenemang',de:'Veranst.',es:'Eventos',fr:'Événements',ja:'イベント',pt:'Eventos'},color:'#c026d3'},
+  {emoji:'🏠',label:{en:'Home',fi:'Koti',sv:'Hem',de:'Zuhause',es:'Casa',fr:'Maison',ja:'ホーム',pt:'Casa'},color:'#fb923c'},
+  {emoji:'🚗',label:{en:'Drive',fi:'Ajo',sv:'Kör',de:'Fahren',es:'Conducir',fr:'Conduire',ja:'ドライブ',pt:'Dirigir'},color:'#64748b'},
+  {emoji:'📊',label:{en:'Stats',fi:'Tilastot',sv:'Statistik',de:'Statistik',es:'Estadísticas',fr:'Stats',ja:'統計',pt:'Estatísticas'},color:'#3b82f6'},
+  {emoji:'🤖',label:{en:'AI',fi:'Tekoäly',sv:'AI',de:'KI',es:'IA',fr:'IA',ja:'AI',pt:'IA'},color:'#22d3ee'},
+  {emoji:'🌸',label:{en:'Sakura',fi:'Kirsikka',sv:'Körsbär',de:'Kirsche',es:'Cerezo',fr:'Cerisier',ja:'桜',pt:'Cerejeira'},color:'#ffb7c5'},
+  {emoji:'💎',label:{en:'Premium',fi:'Premium',sv:'Premium',de:'Premium',es:'Premium',fr:'Premium',ja:'プレミアム',pt:'Premium'},color:'#c8b67a'},
+  {emoji:'🔮',label:{en:'Magic',fi:'Taikuus',sv:'Magi',de:'Magie',es:'Magia',fr:'Magie',ja:'魔法',pt:'Magia'},color:'#7c3aed'}
+];
+
+function iLabel(ic){return typeof ic.label==='string'?ic.label:(ic.label[lang]||ic.label.en)}
+const defIcons=iconLib.slice(0,8).map((l,i)=>({...l,id:i}));
+
+const quizQs=[
+  {q:{en:"Which aesthetic appeals most?",fi:"Mikä estetiikka vetoaa eniten?",sv:"Vilken estetik tilltalar dig mest?",de:"Welche Ästhetik spricht dich an?",es:"¿Qué estética te atrae?",fr:"Quelle esthétique vous plaît?",ja:"どんな美学が好き？",pt:"Qual estética te atrai?"},
+   opts:[{t:{en:"Minimalist & calm",fi:"Minimalistinen",sv:"Minimalistisk",de:"Minimalistisch",es:"Minimalista",fr:"Minimaliste",ja:"ミニマリスト",pt:"Minimalista"},s:{minimal:3,clean:2}},{t:{en:"Luxury & elegant",fi:"Luksus",sv:"Lyx",de:"Luxus",es:"Lujo",fr:"Luxe",ja:"ラグジュアリー",pt:"Luxo"},s:{luxury:3,warm:1}},{t:{en:"Futuristic & neon",fi:"Futuristinen & neon",sv:"Futuristisk",de:"Futuristisch",es:"Futurista",fr:"Futuriste",ja:"ネオン",pt:"Futurista"},s:{cyberpunk:3,neon:2}},{t:{en:"Retro & playful",fi:"Retro & leikkisä",sv:"Retro",de:"Retro",es:"Retro",fr:"Rétro",ja:"レトロ",pt:"Retrô"},s:{y2k:3,dark:1}}]},
+  {q:{en:"How should your screen feel?",fi:"Miltä näytön pitäisi tuntua?",sv:"Hur ska skärmen kännas?",de:"Wie soll sich der Bildschirm anfühlen?",es:"¿Cómo debería sentirse?",fr:"Comment devrait se sentir l'écran?",ja:"画面の雰囲気は？",pt:"Como deve parecer?"},
+   opts:[{t:{en:"Calm & organized",fi:"Tyyneltä",sv:"Lugn",de:"Ruhig",es:"Calmada",fr:"Calme",ja:"穏やか",pt:"Calma"},s:{minimal:3,clean:2}},{t:{en:"Warm & cozy",fi:"Lämpimältä",sv:"Varm",de:"Warm",es:"Cálida",fr:"Chaud",ja:"暖かく",pt:"Quente"},s:{warm:3,luxury:1}},{t:{en:"Energetic & modern",fi:"Energiakkaalta",sv:"Energisk",de:"Energisch",es:"Energética",fr:"Énergique",ja:"エネルギッシュ",pt:"Energética"},s:{cyberpunk:2,neon:2}},{t:{en:"Dark & deep",fi:"Tummalta",sv:"Mörk",de:"Dunkel",es:"Oscura",fr:"Sombre",ja:"暗く",pt:"Escura"},s:{dark:3,midnight:2}}]},
+  {q:{en:"Favorite color palette?",fi:"Suosikki väripaletti?",sv:"Favoritfärger?",de:"Lieblingsfarben?",es:"¿Paleta favorita?",fr:"Palette préférée?",ja:"好きな色は？",pt:"Paleta favorita?"},
+   opts:[{t:{en:"Gold & ivory",fi:"Kulta & norsunluu",sv:"Guld",de:"Gold",es:"Oro",fr:"Or",ja:"ゴールド",pt:"Ouro"},s:{luxury:3,warm:2}},{t:{en:"Black & white",fi:"Mustavalkoinen",sv:"Svartvitt",de:"Schwarz-Weiß",es:"Blanco y negro",fr:"Noir & blanc",ja:"白黒",pt:"Preto e branco"},s:{minimal:3,dark:2}},{t:{en:"Neon & electric",fi:"Neonvärit",sv:"Neon",de:"Neon",es:"Neón",fr:"Néon",ja:"ネオン",pt:"Neon"},s:{neon:3,cyberpunk:2}},{t:{en:"Pastel & soft",fi:"Pastelli",sv:"Pastell",de:"Pastell",es:"Pastel",fr:"Pastel",ja:"パステル",pt:"Pastel"},s:{glass:2,sakura:3}}]},
+  {q:{en:"Stone, marble or nature?",fi:"Kivi, marmori tai luonto?",sv:"Sten, marmor eller natur?",de:"Stein, Marmor oder Natur?",es:"¿Piedra, mármol o naturaleza?",fr:"Pierre, marbre ou nature?",ja:"石、大理石、自然？",pt:"Pedra, mármore ou natureza?"},
+   opts:[{t:{en:"Yes — marble & stone",fi:"Kyllä — marmori",sv:"Ja — marmor",de:"Ja — Marmor",es:"Sí — mármol",fr:"Oui — marbre",ja:"大理石",pt:"Sim — mármore"},s:{marble:3}},{t:{en:"Nature & green",fi:"Luonto & vihreä",sv:"Natur",de:"Natur",es:"Naturaleza",fr:"Nature",ja:"自然",pt:"Natureza"},s:{cottagecore:3,clean:2}},{t:{en:"Snow & arctic",fi:"Lumi & arktinen",sv:"Snö",de:"Schnee",es:"Nieve",fr:"Neige",ja:"雪",pt:"Neve"},s:{arctic:3,glass:1}},{t:{en:"Sand & desert",fi:"Hiekka & aavikko",sv:"Sand",de:"Sand",es:"Arena",fr:"Sable",ja:"砂漠",pt:"Areia"},s:{desert:3,warm:1}}]},
+  {q:{en:"How many icons do you want?",fi:"Kuinka monta ikonia?",sv:"Hur många ikoner?",de:"Wie viele Icons?",es:"¿Cuántos iconos?",fr:"Combien d'icônes?",ja:"アイコンの数は？",pt:"Quantos ícones?"},
+   opts:[{t:{en:"4–6 essentials only",fi:"Vain 4–6",sv:"4–6",de:"4–6",es:"4–6",fr:"4 à 6",ja:"4〜6個",pt:"4–6"},s:{minimal:3,luxury:2}},{t:{en:"8–12 diverse",fi:"8–12",sv:"8–12",de:"8–12",es:"8–12",fr:"8 à 12",ja:"8〜12個",pt:"8–12"},s:{clean:2,y2k:1}},{t:{en:"As few as possible",fi:"Mahdollisimman vähän",sv:"Så få",de:"So wenig",es:"Lo mínimo",fr:"Le moins",ja:"できるだけ少なく",pt:"O mínimo"},s:{minimal:3,dark:1}},{t:{en:"Richly visual",fi:"Visuaalisesti runsas",sv:"Visuellt rikt",de:"Visuell reich",es:"Rico visualmente",fr:"Visuellement riche",ja:"視覚的に豊か",pt:"Visualmente rico"},s:{glass:2,neon:2}}]},
+  {q:{en:"Widgets & info on screen?",fi:"Widgetit näytöllä?",sv:"Widgets på skärmen?",de:"Widgets auf dem Bildschirm?",es:"¿Widgets en pantalla?",fr:"Widgets sur l'écran?",ja:"ウィジェットは？",pt:"Widgets na tela?"},
+   opts:[{t:{en:"One elegant widget",fi:"Yksi tyylikäs widget",sv:"En elegant widget",de:"Ein elegantes Widget",es:"Un widget elegante",fr:"Un widget élégant",ja:"1つのウィジェット",pt:"Um widget elegante"},s:{luxury:3,minimal:2}},{t:{en:"Several useful ones",fi:"Useita hyödyllisiä",sv:"Flera användbara",de:"Mehrere nützliche",es:"Varios útiles",fr:"Plusieurs utiles",ja:"いくつか便利なもの",pt:"Vários úteis"},s:{clean:2,y2k:1}},{t:{en:"None at all",fi:"Ei lainkaan",sv:"Inga alls",de:"Keine",es:"Ninguno",fr:"Aucun",ja:"なし",pt:"Nenhum"},s:{minimal:3,dark:2}},{t:{en:"Visual & animated",fi:"Visuaalisia & animoituja",sv:"Visuella",de:"Visuell",es:"Visuales",fr:"Visuels",ja:"視覚的",pt:"Visuais"},s:{glass:3,neon:1}}]}
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let S={theme:'luxury',wallpaper:0,icons:JSON.parse(JSON.stringify(defIcons)),streak:7,xp:2480,username:'Nova',scheme:'dark'};
+let editIdx=null,qStep=0,qAns=[];
+let dip=null;
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  loadState();
+  lang=localStorage.getItem('df_lang')||'en';
+  document.documentElement.setAttribute('data-theme',S.scheme);
+  renderAll();
+  applyTrans();
+  updateStats();
+  tickTime();
+  setInterval(tickTime,10000);
+  // PWA
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;document.getElementById('install-btn').classList.add('visible')});
+  window.addEventListener('appinstalled',()=>{document.getElementById('install-btn').classList.remove('visible');toast('DeviceForge installed! 📱');confetti(20)});
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  if(isIOS&&!navigator.standalone){setTimeout(()=>{const b=document.getElementById('install-btn');if(!b.classList.contains('visible')){b.innerHTML='<i class="fa-solid fa-share-from-square"></i> Add to Home';b.classList.add('visible');b.onclick=()=>toast(t('installTip'))}},7000)}
+  // Konami
+  let ks=[];const kc=[38,38,40,40,37,39,37,39,66,65];
+  document.addEventListener('keydown',e=>{ks.push(e.keyCode);if(ks.length>10)ks.shift();if(ks.join(',')===kc.join(','))unlockCyberpunk();if(e.metaKey&&e.key==='s'){e.preventDefault();saveSetup()}if(e.key==='?')openQuiz()});
+  if(!localStorage.getItem('df_welcomed')){setTimeout(()=>{toast('Welcome to DeviceForge! Tap an icon to customize it.');localStorage.setItem('df_welcomed','1')},3500)}
+}
+function unlockCyberpunk(){applyTheme('cyberpunk');confetti(40);toast('🔥 Cyberpunk unlocked!')}
+
+function renderAll(){
+  renderThemeList();renderWpGrid();renderIcons();
+  applyTheme(S.theme,false);applyWallpaper(S.wallpaper,false);
+  updateSetupInfo();
+}
+
+function tickTime(){
+  const n=new Date();
+  document.getElementById('p-time').textContent=`${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  document.getElementById('p-date').textContent=`${days[n.getDay()]} ${n.getDate()}.${n.getMonth()+1}`;
+}
+
+// ============================================================
+// THEMES
+// ============================================================
+function renderThemeList(){
+  const el=document.getElementById('theme-list');
+  el.innerHTML=themes.map(th=>`
+    <div class="theme-item${S.theme===th.id?' active':''}" onclick="applyTheme('${th.id}');addXP(25)">
+      <div class="theme-swatch" style="background:${th.color}18;color:${th.color}"><i class="fa-solid ${th.icon}"></i></div>
+      <div><div class="theme-name">${th.name}</div><div class="theme-desc">${th.desc}</div></div>
+    </div>`).join('');
+}
+
+function getIconBg(themeId,iconColor){
+  const map={minimal:'rgba(100,100,120,0.35)',cyberpunk:'rgba(0,30,60,0.7)',dark:'rgba(20,20,50,0.7)',neon:'rgba(40,0,80,0.7)',marble:'rgba(200,196,190,0.3)',sakura:'rgba(255,183,197,0.25)',arctic:'rgba(168,216,234,0.3)',brutalist:'rgba(30,30,0,0.8)',cottagecore:'rgba(163,184,153,0.25)',midnight:'rgba(20,10,50,0.7)',desert:'rgba(60,30,10,0.7)'};
+  return map[themeId]||iconColor+'99';
+}
+
+function applyTheme(id,animate=true){
+  S.theme=id;
+  const th=themes.find(t=>t.id===id);if(!th)return;
+  document.querySelectorAll('.phone-icon-wrap').forEach((el,i)=>{
+    if(S.icons[i]){el.style.background=getIconBg(id,S.icons[i].color);el.style.boxShadow=`0 4px 14px ${th.color}22,inset 0 1px 0 rgba(255,255,255,0.25)`}
+  });
+  document.querySelectorAll('.dock-icon').forEach(el=>{el.style.background=getIconBg(id,'rgba(255,255,255,0.12)')});
+  document.querySelectorAll('.theme-item').forEach((el,i)=>el.classList.toggle('active',themes[i].id===id));
+  updateSetupInfo();
+  if(animate){const p=document.getElementById('phone-shell');p.style.transition='transform 0.25s cubic-bezier(0.23,1,0.32,1)';p.style.transform='scale(0.95)';setTimeout(()=>p.style.transform='scale(1)',220)}
+  saveState();
+}
+
+// ============================================================
+// WALLPAPERS
+// ============================================================
+function renderWpGrid(){
+  const g=document.getElementById('wp-grid');
+  g.innerHTML=wallpapers.slice(0,6).map(wp=>`
+    <div class="wp-thumb${S.wallpaper===wp.id?' active':''}" style="background:${wp.css}" onclick="applyWallpaper(${wp.id});addXP(15)">
+      <div class="wp-thumb-name">${wp.name}</div>
+    </div>`).join('');
+}
+function applyWallpaper(id,animate=true){
+  S.wallpaper=id;
+  const wp=wallpapers.find(w=>w.id===id);if(!wp)return;
+  const el=document.getElementById('phone-wp');
+  if(animate){el.style.opacity='0';setTimeout(()=>{el.style.background=wp.css;el.style.transition='opacity 0.45s';el.style.opacity='1'},50)}
+  else el.style.background=wp.css;
+  document.querySelectorAll('#wp-grid .wp-thumb').forEach((el,i)=>el.classList.toggle('active',wallpapers[i].id===id));
+  updateSetupInfo();saveState();
+}
+function showAllWp(){
+  const g=document.getElementById('all-wp');
+  g.innerHTML=wallpapers.map(wp=>`
+    <div class="wp-thumb${S.wallpaper===wp.id?' active':''}" style="background:${wp.css};aspect-ratio:9/16" onclick="applyWallpaper(${wp.id});addXP(15);closeModal('wp-modal')">
+      <div class="wp-thumb-name">${wp.name}</div>
+    </div>`).join('');
+  openModal('wp-modal');
+}
+
+// ============================================================
+// ICONS
+// ============================================================
+function renderIcons(){
+  const g=document.getElementById('icons-grid');
+  const th=themes.find(t=>t.id===S.theme)||themes[0];
+  g.innerHTML=S.icons.map((ic,i)=>`
+    <div class="phone-icon" onclick="openIconPicker(${i})">
+      <div class="phone-icon-wrap" style="background:${getIconBg(S.theme,ic.color)};box-shadow:0 4px 14px ${th.color}22,inset 0 1px 0 rgba(255,255,255,0.25)">
+        <span style="font-size:22px">${ic.emoji}</span>
+      </div>
+      <div class="phone-icon-label">${iLabel(ic)}</div>
+    </div>`).join('');
+  renderDock();
+}
+function renderDock(){
+  const d=document.getElementById('phone-dock');
+  d.innerHTML=S.icons.slice(0,4).map((ic,i)=>`
+    <div class="dock-icon" style="background:${getIconBg(S.theme,ic.color)}" onclick="openIconPicker(${i})">
+      <span style="font-size:20px">${ic.emoji}</span>
+    </div>`).join('');
+}
+function openIconPicker(idx){
+  editIdx=idx;
+  document.getElementById('icon-sub').textContent=iLabel(S.icons[idx]);
+  const g=document.getElementById('icon-grid');
+  g.innerHTML=iconLib.map(lib=>`
+    <div class="icon-pick${S.icons[idx].emoji===lib.emoji?' sel':''}" onclick="pickIcon(${iconLib.indexOf(lib)})">
+      <div class="icon-pick-circle" style="background:${lib.color}22;border:1px solid ${lib.color}33"><span>${lib.emoji}</span></div>
+      <div class="icon-pick-label">${iLabel(lib)}</div>
+    </div>`).join('');
+  openModal('icon-modal');
+}
+function pickIcon(i){
+  S.icons[editIdx]={...iconLib[i],id:editIdx};
+  renderIcons();closeModal('icon-modal');addXP(10);updateSetupInfo();saveState();
+}
+
+// ============================================================
+// SETUP INFO
+// ============================================================
+function updateSetupInfo(){
+  const th=themes.find(t=>t.id===S.theme);
+  const wp=wallpapers.find(w=>w.id===S.wallpaper);
+  document.getElementById('setup-info').innerHTML=`
+    <div class="setup-row"><span class="setup-label">${t('theme')}</span><span class="setup-val" style="color:${th.color}">${th.name}</span></div>
+    <div class="setup-row"><span class="setup-label">${t('wallpaper')}</span><span class="setup-val">${wp.name}</span></div>
+    <div class="setup-row"><span class="setup-label">${t('icons')}</span><span class="setup-val">${S.icons.length}</span></div>`;
+}
+
+// ============================================================
+// QUICK ACTIONS
+// ============================================================
+function randomizeSetup(){
+  applyTheme(themes[Math.floor(Math.random()*themes.length)].id);
+  applyWallpaper(Math.floor(Math.random()*wallpapers.length));
+  S.icons.forEach((ic,i)=>{if(Math.random()>.5){const r=iconLib[Math.floor(Math.random()*iconLib.length)];S.icons[i]={...r,id:i}}});
+  renderIcons();updateSetupInfo();addXP(45);toast(t('randomized'));
+}
+function resetToDefault(){
+  S.theme='luxury';S.wallpaper=0;S.icons=JSON.parse(JSON.stringify(defIcons));
+  renderAll();toast(t('resetDone'));
+}
+function completeDailyChallenge(){
+  addXP(120);S.streak++;document.getElementById('sv-streak').textContent=S.streak;
+  toast(t('challengeDone'));confetti(22);applyTheme('luxury');saveState();
+}
+function shareSetup(){
+  if(navigator.share)navigator.share({title:'DeviceForge Setup',text:`My ${themes.find(t=>t.id===S.theme).name} setup on DeviceForge!`,url:location.href}).catch(()=>{});
+  else navigator.clipboard?.writeText(location.href).then(()=>toast('Link copied!'));
+}
+function capturePreview(){toast('Use browser screenshot: Cmd+Shift+4 (Mac) or volume+power (phone)')}
+
+// ============================================================
+// SAVE / LOAD
+// ============================================================
+function saveSetup(){
+  const name=prompt(t('saveSetupName'),`Setup ${new Date().toLocaleDateString()}`);
+  if(!name)return;
+  const arr=JSON.parse(localStorage.getItem('df_setups')||'[]');
+  arr.unshift({id:Date.now(),name,theme:S.theme,wallpaper:S.wallpaper,icons:JSON.parse(JSON.stringify(S.icons)),date:new Date().toISOString()});
+  if(arr.length>10)arr.length=10;
+  localStorage.setItem('df_setups',JSON.stringify(arr));
+  addXP(80);toast(`"${name}" ${t('setupSaved')}`);confetti(16);
+}
+function showSaved(){
+  const arr=JSON.parse(localStorage.getItem('df_setups')||'[]');
+  const c=document.getElementById('saved-list');
+  c.innerHTML=arr.length?arr.map(s=>{const th=themes.find(t=>t.id===s.theme);return`<div class="setup-item" onclick="loadSaved(${s.id})"><div><div style="font-size:13px;font-weight:500">${s.name}</div><div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:2px">${new Date(s.date).toLocaleDateString()} · ${th?th.name:s.theme}</div></div><div style="font-family:var(--mono);font-size:11px;color:var(--accent)">+${Math.floor(Math.random()*60)+40} XP</div></div>`}).join(''):`<div style="text-align:center;color:var(--t3);padding:28px 0;font-family:var(--mono);font-size:12px">${t('noSetups')}</div>`;
+  openModal('saved-modal');
+}
+function loadSaved(id){
+  const arr=JSON.parse(localStorage.getItem('df_setups')||'[]');
+  const s=arr.find(x=>x.id===id);if(!s)return;
+  S.theme=s.theme;S.wallpaper=s.wallpaper;S.icons=JSON.parse(JSON.stringify(s.icons));
+  renderAll();closeModal('saved-modal');toast(t('setupLoaded'));
+}
+
+// ============================================================
+// AI ADVISOR
+// ============================================================
+async function openAI(){
+  openModal('ai-modal');
+  const body=document.getElementById('ai-body');
+  const th=themes.find(t=>t.id===S.theme);
+  const wp=wallpapers.find(w=>w.id===S.wallpaper);
+  body.innerHTML=`<div class="ai-thinking"><div class="ai-spin"></div><span>${t('aiThinking')}</span></div>`;
+  const prompt=`You are a premium home screen design expert. The user's setup: theme="${th.name}", wallpaper="${wp.name}", ${S.icons.length} icons. Give 3 short, specific, enthusiastic improvement tips in 2-3 sentences total. Be direct and inspiring.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const txt=data.content?.map(c=>c.text||'').join('')||'Unable to connect right now.';
+    body.innerHTML=`<div class="ai-bubble">${txt.replace(/\n/g,'<br>')}</div><div style="margin-top:14px;display:flex;gap:7px;flex-wrap:wrap"><button class="btn-primary" style="padding:8px 16px;font-size:12px" onclick="randomizeSetup();closeModal('ai-modal')"><i class="fa-solid fa-shuffle"></i> ${t('randomize')}</button><button class="btn-secondary" style="padding:8px 14px;font-size:12px" onclick="closeModal('ai-modal')">${t('cancel')}</button></div>`;
+  }catch{body.innerHTML=`<div class="ai-bubble" style="color:var(--t2)">Try pairing <strong>${themes[Math.floor(Math.random()*themes.length)].name}</strong> theme with the <strong>${wallpapers[Math.floor(Math.random()*wallpapers.length)].name}</strong> wallpaper for a stunning new look!</div>`}
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+function openQuiz(){qStep=0;qAns=[];renderQ();openModal('quiz-modal')}
+function renderQ(){
+  const q=quizQs[qStep];
+  const prog=((qStep+1)/quizQs.length)*100;
+  document.getElementById('quiz-prog').textContent=`${qStep+1} / ${quizQs.length}`;
+  document.getElementById('quiz-next-txt').textContent=qStep===quizQs.length-1?t('finish'):t('next');
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="quiz-progress"><div class="quiz-fill" style="width:${prog}%"></div></div>
+    <div class="quiz-q">${q.q[lang]||q.q.en}</div>
+    ${q.opts.map((o,i)=>`<div class="quiz-opt${qAns[qStep]===i?' sel':''}" onclick="selQ(${i})"><div class="quiz-radio"></div><span>${o.t[lang]||o.t.en}</span></div>`).join('')}`;
+  document.getElementById('quiz-prev').disabled=qStep===0;
+}
+function selQ(i){qAns[qStep]=i;document.querySelectorAll('#quiz-body .quiz-opt').forEach((el,idx)=>el.classList.toggle('sel',idx===i))}
+function nextQ(){if(qAns[qStep]===undefined){toast(t('selectOption'));return}if(qStep<quizQs.length-1){qStep++;renderQ()}else finishQuiz()}
+function prevQ(){if(qStep>0){qStep--;renderQ()}}
+function finishQuiz(){
+  let sc={};
+  qAns.forEach((ai,qi)=>{const so=quizQs[qi].opts[ai]?.s||{};Object.entries(so).forEach(([k,v])=>sc[k]=(sc[k]||0)+v)});
+  const best=Object.entries(sc).sort((a,b)=>b[1]-a[1])[0]?.[0]||'minimal';
+  const th=themes.find(t=>t.id===best)||themes[0];
+  document.getElementById('quiz-body').innerHTML=`
+    <div style="text-align:center;padding:8px 0">
+      <div style="width:70px;height:70px;border-radius:50%;background:${th.color}18;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:30px;color:${th.color}"><i class="fa-solid ${th.icon}"></i></div>
+      <div style="font-size:13px;color:var(--t2);margin-bottom:5px">${t('yourStyleIs')}</div>
+      <div style="font-size:32px;font-weight:600;color:${th.color};margin-bottom:6px">${th.name}</div>
+      <div style="font-size:12px;color:var(--t2);max-width:260px;margin:0 auto 22px">${th.desc}</div>
+      <div style="display:flex;gap:9px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-primary" style="padding:9px 18px;font-size:12px" onclick="applyTheme('${best}');closeModal('quiz-modal');confetti(20);toast(t('quizDone'))">${t('applyTheme')}</button>
+        <button class="btn-secondary" style="padding:9px 14px;font-size:12px" onclick="closeModal('quiz-modal')">${t('noThanks')}</button>
+      </div>
+    </div>`;
+  document.getElementById('quiz-footer').style.display='none';
+  addXP(95);
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='quiz-modal')document.getElementById('quiz-footer').style.display=''}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)closeModal(this.id)}));
+
+// ============================================================
+// UTILS
+// ============================================================
+function addXP(n){S.xp+=n;document.getElementById('sv-xp').textContent=S.xp.toLocaleString();if(n>20)confetti(9);saveState()}
+function updateStats(){document.getElementById('sv-streak').textContent=S.streak;document.getElementById('sv-xp').textContent=S.xp.toLocaleString();document.getElementById('u-name').textContent=S.username;document.getElementById('u-avatar').textContent=S.username.charAt(0).toUpperCase()}
+function editName(){const n=prompt(t('enterName'),S.username);if(n?.trim()){S.username=n.trim();updateStats();saveState()}}
+function toggleScheme(){S.scheme=S.scheme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',S.scheme);saveState()}
+function installPWA(){if(dip){dip.prompt();dip.userChoice.then(c=>{dip=null;if(c.outcome==='accepted')document.getElementById('install-btn').classList.remove('visible')})}else toast(t('installTip'))}
+
+function toast(msg){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');
+  el.className='toast';el.textContent=msg;c.appendChild(el);
+  setTimeout(()=>el.remove(),2700);
+}
+
+function confetti(n=12){
+  const cols=['#a78bfa','#4ade80','#60a5fa','#f472b6','#fb923c','#fbbf24'];
+  for(let i=0;i<n;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='cp';
+      el.style.cssText=`left:${Math.random()*100}vw;top:-12px;width:${Math.random()*7+4}px;height:${Math.random()*7+4}px;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${Math.random()*1.5+2.2}s;transform:rotate(${Math.random()*360}deg)`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),3800);
+    },i*40);
+  }
+}
+
+// ============================================================
+// STATE
+// ============================================================
+function saveState(){localStorage.setItem('df_state',JSON.stringify({...S,lang}))}
+function loadState(){
+  const d=localStorage.getItem('df_state');if(!d)return;
+  try{const p=JSON.parse(d);if(p.theme)S.theme=p.theme;if(p.wallpaper!==undefined)S.wallpaper=p.wallpaper;if(p.icons?.length)S.icons=p.icons;if(p.streak)S.streak=p.streak;if(p.xp)S.xp=p.xp;if(p.username)S.username=p.username;if(p.scheme)S.scheme=p.scheme;if(p.lang)lang=p.lang}catch{}
+}
+
+window.addEventListener('load',init);
+</script>
+</body>
+</html>
