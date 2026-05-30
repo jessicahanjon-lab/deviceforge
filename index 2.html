@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DeviceForge" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="description" content="Craft your perfect home screen — DeviceForge PWA" />
+  <title>DeviceForge</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', system-ui, sans-serif;
+
+      /* Dark theme (default) */
+      --bg:        #0a0a0f;
+      --bg2:       #12121a;
+      --bg3:       #1a1a26;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.13);
+      --text:      #e8e8f0;
+      --text2:     #888899;
+      --text3:     #555566;
+      --accent:    #c8b67a;
+      --accent2:   #8b7d52;
+      --green:     #4ade80;
+      --red:       #f87171;
+      --glass:     rgba(255,255,255,0.03);
+      --glass2:    rgba(255,255,255,0.06);
+      --shadow:    0 32px 64px rgba(0,0,0,0.6);
+      --radius:    20px;
+      --radius-sm: 12px;
+      --radius-xs: 8px;
+    }
+
+    [data-theme="light"] {
+      --bg:        #f4f2ee;
+      --bg2:       #ede9e2;
+      --bg3:       #e5e0d8;
+      --border:    rgba(0,0,0,0.07);
+      --border2:   rgba(0,0,0,0.14);
+      --text:      #1a1a26;
+      --text2:     #666677;
+      --text3:     #aaaaaa;
+      --glass:     rgba(0,0,0,0.02);
+      --glass2:    rgba(0,0,0,0.04);
+      --shadow:    0 32px 64px rgba(0,0,0,0.15);
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    input, select { font-family: inherit; }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+    /* ===== NOISE TEXTURE OVERLAY ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 0 clamp(16px, 4vw, 48px);
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-brand {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text);
+    }
+    .header-brand-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: #0a0a0f;
+    }
+    .header-brand-name {
+      font-family: var(--serif);
+      font-size: 22px; font-weight: 600; letter-spacing: 0.02em;
+    }
+    .header-brand-badge {
+      font-family: var(--mono);
+      font-size: 9px; color: var(--green); letter-spacing: 1px;
+      padding: 2px 6px; border: 1px solid var(--green);
+      border-radius: 4px; opacity: 0.8;
+    }
+
+    .header-right {
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .header-stats {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .stat-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 12px;
+    }
+    .stat-pill .stat-val { font-family: var(--mono); font-weight: 500; }
+
+    /* Lang selector */
+    .lang-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--bg2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text2); transition: all 0.2s;
+      position: relative;
+    }
+    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .lang-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 6px;
+      min-width: 160px; z-index: 200;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+    .lang-dropdown.open { display: block; animation: fadeDown 0.18s ease; }
+    .lang-option {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 8px;
+      cursor: pointer; font-size: 13px; transition: background 0.15s;
+    }
+    .lang-option:hover { background: var(--bg3); }
+    .lang-option.active { color: var(--accent); }
+    .lang-option .flag { font-size: 16px; }
+
+    /* Theme toggle */
+    .theme-toggle {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--bg2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: var(--text2); transition: all 0.2s;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Install btn */
+    .install-btn {
+      display: none; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 99px;
+      background: var(--accent); color: #0a0a0f;
+      font-size: 12px; font-weight: 600; transition: all 0.2s;
+    }
+    .install-btn.visible { display: flex; }
+    .install-btn:hover { opacity: 0.88; transform: scale(1.02); }
+
+    /* User chip */
+    .user-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 10px 4px 4px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 99px; cursor: pointer; transition: all 0.2s;
+    }
+    .user-chip:hover { border-color: var(--border2); }
+    .user-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: #0a0a0f;
+    }
+    .user-name { font-size: 13px; font-weight: 500; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main {
+      max-width: 1280px; margin: 0 auto;
+      padding: clamp(20px, 4vw, 48px) clamp(16px, 4vw, 48px);
+      position: relative; z-index: 1;
+    }
+
+    /* Daily Challenge Banner */
+    .challenge-banner {
+      background: linear-gradient(120deg, rgba(200,182,122,0.08) 0%, rgba(139,125,82,0.04) 100%);
+      border: 1px solid rgba(200,182,122,0.2);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      flex-wrap: wrap;
+    }
+    .challenge-left { display: flex; align-items: center; gap: 14px; }
+    .challenge-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .challenge-label { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 1px; margin-bottom: 3px; }
+    .challenge-title { font-size: 15px; font-weight: 500; }
+    .challenge-btn {
+      padding: 9px 20px;
+      background: var(--accent); color: #0a0a0f;
+      border-radius: 99px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 7px; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .challenge-btn:hover { opacity: 0.88; }
+
+    /* ===== GRID ===== */
+    .grid-3col {
+      display: grid;
+      grid-template-columns: 260px 1fr 260px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .grid-3col { grid-template-columns: 220px 1fr 220px; gap: 16px; }
+    }
+    @media (max-width: 860px) {
+      .grid-3col { grid-template-columns: 1fr; }
+      .col-left { order: 2; }
+      .col-center { order: 1; }
+      .col-right { order: 3; }
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .card + .card { margin-top: 16px; }
+    .card-label {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--text3); letter-spacing: 1.5px;
+      text-transform: uppercase; margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-label-count { color: var(--accent); }
+
+    /* ===== THEMES ===== */
+    .theme-list { display: flex; flex-direction: column; gap: 6px; }
+    .theme-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      cursor: pointer; transition: all 0.18s; background: var(--bg3);
+    }
+    .theme-item:hover { border-color: var(--border2); }
+    .theme-item.active { border-color: var(--accent); background: rgba(200,182,122,0.06); }
+    .theme-swatch {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+      flex-shrink: 0;
+    }
+    .theme-item-info { flex: 1; min-width: 0; }
+    .theme-item-name { font-size: 13px; font-weight: 500; }
+    .theme-item-desc { font-size: 11px; color: var(--text3); }
+
+    /* ===== PHONE PREVIEW ===== */
+    .phone-wrap {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .preview-toolbar {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center;
+    }
+    .preview-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 99px; font-family: var(--mono); font-size: 10px; color: var(--green);
+    }
+    .preview-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+    .preview-action {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 99px; font-size: 11px; cursor: pointer; transition: all 0.2s;
+      color: var(--text2);
+    }
+    .preview-action:hover { border-color: var(--border2); color: var(--text); }
+
+    .phone-outer {
+      width: 300px; height: 620px;
+      background: #0d0d12;
+      border-radius: 52px;
+      box-shadow:
+        0 0 0 10px #1c1c28,
+        0 0 0 14px #141420,
+        0 40px 80px rgba(0,0,0,0.6),
+        0 8px 24px rgba(0,0,0,0.4);
+      position: relative; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .phone-notch {
+      position: absolute; top: 10px; left: 50%;
+      transform: translateX(-50%);
+      width: 110px; height: 26px;
+      background: #0d0d12;
+      border-radius: 99px; z-index: 50;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .phone-screen {
+      width: 100%; height: 100%;
+      position: relative; overflow: hidden;
+    }
+    .phone-wallpaper {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      transition: background 0.6s cubic-bezier(0.23,1,0.32,1);
+    }
+    .phone-status {
+      position: relative; z-index: 30;
+      height: 42px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; font-weight: 600; color: white;
+      background: rgba(0,0,0,0.15);
+      backdrop-filter: blur(4px);
+    }
+    .phone-status-right { display: flex; align-items: center; gap: 4px; font-size: 10px; }
+    .phone-content { position: relative; z-index: 10; }
+
+    .phone-date-widget {
+      padding: 6px 20px 0;
+    }
+    .phone-date-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px; background: rgba(0,0,0,0.35);
+      border-radius: 99px; font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+    }
+
+    .phone-weather-widget {
+      margin: 8px 16px 0;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+    }
+    .phone-weather-temp { font-size: 32px; font-weight: 300; color: white; line-height: 1; }
+    .phone-weather-info { font-size: 10px; color: rgba(255,255,255,0.55); }
+    .phone-weather-icon { font-size: 28px; margin-left: auto; }
+
+    .phone-icons-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; padding: 16px;
+    }
+    .phone-icon {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      cursor: pointer; transition: transform 0.18s cubic-bezier(0.23,1,0.32,1);
+    }
+    .phone-icon:active { transform: scale(0.9); }
+    .phone-icon-circle {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+      transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+    }
+    .phone-icon-label {
+      font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.85);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+      text-align: center; max-width: 56px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .phone-dock {
+      position: absolute; bottom: 20px; left: 16px; right: 16px;
+      padding: 10px;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 22px;
+      display: flex; justify-content: center; gap: 12px;
+    }
+    .phone-dock-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      transition: transform 0.18s;
+    }
+    .phone-dock-icon:active { transform: scale(0.9); }
+
+    /* ===== WALLPAPER GRID ===== */
+    .wallpaper-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .wp-thumb {
+      aspect-ratio: 9/16;
+      border-radius: var(--radius-sm);
+      cursor: pointer; position: relative; overflow: hidden;
+      border: 2px solid transparent; transition: all 0.2s;
+    }
+    .wp-thumb:hover { transform: scale(1.04); }
+    .wp-thumb.active { border-color: var(--accent); }
+    .wp-thumb-name {
+      position: absolute; bottom: 0; inset-x: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+      padding: 6px 5px 4px;
+      font-size: 9px; font-weight: 500; color: white;
+    }
+
+    /* ===== QUICK ACTIONS ===== */
+    .action-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+      transition: all 0.18s; color: var(--text);
+    }
+    .action-btn + .action-btn { margin-top: 6px; }
+    .action-btn:hover { border-color: var(--border2); background: var(--bg2); }
+    .action-btn:active { transform: scale(0.985); }
+
+    /* ===== DNA QUIZ CARD ===== */
+    .dna-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px;
+      cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px;
+    }
+    .dna-card:hover { border-color: rgba(200,182,122,0.3); background: rgba(200,182,122,0.04); }
+    .dna-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: rgba(200,182,122,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--accent); flex-shrink: 0;
+    }
+    .dna-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .dna-sub { font-size: 11px; color: var(--text3); }
+
+    /* ===== CURRENT SETUP ===== */
+    .setup-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .setup-row:last-child { border-bottom: none; }
+    .setup-row-label { color: var(--text2); }
+    .setup-row-val { font-weight: 500; font-family: var(--mono); font-size: 12px; }
+
+    /* ===== BOTTOM BAR ===== */
+    .bottom-bar {
+      margin-top: 32px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 24px;
+      background: var(--text); color: var(--bg);
+      border-radius: 99px; font-size: 14px; font-weight: 600;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-secondary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 20px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 99px; font-size: 14px; font-weight: 500;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-secondary:hover { border-color: var(--border2); }
+    .bottom-note { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+    /* ===== MODALS ===== */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      z-index: 300; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    .modal-box {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 24px; width: 100%; max-width: 440px;
+      max-height: 90dvh; overflow-y: auto;
+      animation: slideUp 0.22s cubic-bezier(0.23,1,0.32,1);
+      position: relative;
+    }
+    .modal-header {
+      padding: 22px 24px 16px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-family: var(--serif); font-size: 22px; font-weight: 600; }
+    .modal-sub { font-size: 12px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--bg3); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--text2); flex-shrink: 0; cursor: pointer; transition: all 0.15s;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer {
+      padding: 16px 24px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+
+    /* Icon Picker */
+    .icon-picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .icon-pick-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 6px; border-radius: 12px; cursor: pointer;
+      border: 1px solid transparent; transition: all 0.15s;
+    }
+    .icon-pick-item:hover { background: var(--bg3); border-color: var(--border); }
+    .icon-pick-item.selected { border-color: var(--accent); background: rgba(200,182,122,0.06); }
+    .icon-pick-circle {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .icon-pick-label { font-size: 10px; color: var(--text2); text-align: center; }
+
+    /* Quiz Modal */
+    .quiz-progress-bar {
+      height: 3px; background: var(--bg3); border-radius: 99px; overflow: hidden; margin-bottom: 24px;
+    }
+    .quiz-progress-fill { height: 100%; background: var(--accent); transition: width 0.35s ease; border-radius: 99px; }
+    .quiz-question-text { font-family: var(--serif); font-size: 22px; line-height: 1.35; margin-bottom: 20px; }
+    .quiz-option {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); cursor: pointer;
+      transition: all 0.15s; font-size: 14px; margin-bottom: 8px;
+    }
+    .quiz-option:hover { border-color: var(--border2); background: var(--bg3); }
+    .quiz-option.selected { border-color: var(--accent); background: rgba(200,182,122,0.06); }
+    .quiz-radio {
+      width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border2);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+    }
+    .quiz-option.selected .quiz-radio { border-color: var(--accent); background: var(--accent); }
+    .quiz-option.selected .quiz-radio::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #0a0a0f; display: block; }
+
+    /* Saved Setups */
+    .setup-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); cursor: pointer;
+      transition: all 0.15s; gap: 10px; margin-bottom: 6px;
+    }
+    .setup-item:hover { border-color: var(--border2); background: var(--bg3); }
+
+    /* AI Advisor */
+    .ai-bubble {
+      padding: 14px 16px;
+      background: rgba(200,182,122,0.06); border: 1px solid rgba(200,182,122,0.15);
+      border-radius: 16px; font-size: 13px; line-height: 1.6;
+    }
+    .ai-thinking {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px; color: var(--accent);
+    }
+    .ai-spinner {
+      width: 14px; height: 14px; border: 2px solid rgba(200,182,122,0.2);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ===== TOASTS ===== */
+    #toast-container {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: center;
+      pointer-events: none;
+    }
+    .toast {
+      padding: 10px 18px;
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 99px; font-size: 13px;
+      box-shadow: var(--shadow);
+      animation: slideUpFade 0.25s ease, fadeOut 0.3s ease 2.2s forwards;
+      white-space: nowrap;
+    }
+
+    /* ===== CONFETTI ===== */
+    .confetti-piece {
+      position: fixed; z-index: 9999; pointer-events: none;
+      animation: confettiFall linear forwards;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUpFade { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 600px) {
+      .header-stats { display: none; }
+      .bottom-note { display: none; }
+      .phone-outer { width: 280px; height: 575px; }
+    }
+
+    /* ===== AI ADVISOR SECTION ===== */
+    .ai-advisor-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px; margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <a class="header-brand" href="#" onclick="return false">
+    <div class="header-brand-icon">⚙</div>
+    <span class="header-brand-name">DeviceForge</span>
+    <span class="header-brand-badge">PWA</span>
+  </a>
+
+  <div class="header-right">
+    <div class="header-stats">
+      <div class="stat-pill">
+        <i class="fa-solid fa-fire" style="color:#f97316"></i>
+        <span class="stat-val" id="streak-val">7</span>
+        <span style="font-size:11px;color:var(--text3)" data-i18n="days"></span>
+      </div>
+      <div class="stat-pill">
+        <i class="fa-solid fa-bolt" style="color:#f59e0b"></i>
+        <span class="stat-val" id="xp-val">2480</span>
+        <span style="font-size:11px;color:var(--text3)">XP</span>
+      </div>
+    </div>
+
+    <!-- Language -->
+    <div style="position:relative">
+      <button class="lang-btn" id="lang-btn" onclick="toggleLangMenu()">
+        <span id="lang-flag">🌐</span>
+      </button>
+      <div class="lang-dropdown" id="lang-dropdown">
+        <div class="lang-option" data-lang="en" onclick="setLang('en')"><span class="flag">🇬🇧</span> English</div>
+        <div class="lang-option" data-lang="fi" onclick="setLang('fi')"><span class="flag">🇫🇮</span> Suomi</div>
+        <div class="lang-option" data-lang="sv" onclick="setLang('sv')"><span class="flag">🇸🇪</span> Svenska</div>
+        <div class="lang-option" data-lang="de" onclick="setLang('de')"><span class="flag">🇩🇪</span> Deutsch</div>
+        <div class="lang-option" data-lang="es" onclick="setLang('es')"><span class="flag">🇪🇸</span> Español</div>
+        <div class="lang-option" data-lang="fr" onclick="setLang('fr')"><span class="flag">🇫🇷</span> Français</div>
+        <div class="lang-option" data-lang="ja" onclick="setLang('ja')"><span class="flag">🇯🇵</span> 日本語</div>
+        <div class="lang-option" data-lang="pt" onclick="setLang('pt')"><span class="flag">🇧🇷</span> Português</div>
+      </div>
+    </div>
+
+    <!-- Theme toggle -->
+    <button class="theme-toggle" onclick="toggleColorScheme()" title="Toggle theme">
+      <i class="fa-solid fa-circle-half-stroke" id="theme-icon"></i>
+    </button>
+
+    <!-- Install -->
+    <button class="install-btn" id="install-btn" onclick="installPWA()">
+      <i class="fa-solid fa-download"></i>
+      <span data-i18n="install"></span>
+    </button>
+
+    <!-- User -->
+    <div class="user-chip" onclick="editName()">
+      <div class="user-avatar" id="user-avatar">N</div>
+      <span class="user-name" id="user-name-display">Nova</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- Challenge Banner -->
+  <div class="challenge-banner">
+    <div class="challenge-left">
+      <div class="challenge-icon">☀️</div>
+      <div>
+        <div class="challenge-label" data-i18n="dailyChallenge"></div>
+        <div class="challenge-title" id="challenge-text" data-i18n="challengeText"></div>
+      </div>
+    </div>
+    <button class="challenge-btn" onclick="completeDailyChallenge()">
+      <span data-i18n="startBuilding"></span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- 3-col grid -->
+  <div class="grid-3col">
+
+    <!-- LEFT: Controls -->
+    <div class="col-left">
+      <!-- Themes -->
+      <div class="card">
+        <div class="card-label">
+          <span data-i18n="themes"></span>
+          <span class="card-label-count">8</span>
+        </div>
+        <div class="theme-list" id="theme-list"><!-- JS --></div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <div class="card-label" data-i18n="quickActions"></div>
+        <button class="action-btn" onclick="randomizeSetup()">
+          <i class="fa-solid fa-shuffle"></i>
+          <span data-i18n="randomize"></span>
+        </button>
+        <button class="action-btn" onclick="resetToDefault()">
+          <i class="fa-solid fa-rotate-left"></i>
+          <span data-i18n="reset"></span>
+        </button>
+        <button class="action-btn" onclick="openAIAdvisor()">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent)"></i>
+          <span data-i18n="aiAdvisor"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- CENTER: Phone Preview -->
+    <div class="col-center">
+      <div class="phone-wrap">
+        <div class="preview-toolbar">
+          <div class="preview-badge">
+            <div class="dot"></div>
+            <span>LIVE PREVIEW</span>
+          </div>
+          <button class="preview-action" onclick="capturePreview()">
+            <i class="fa-solid fa-download"></i>
+            <span data-i18n="saveImage"></span>
+          </button>
+          <button class="preview-action" onclick="shareSetup()">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span data-i18n="share"></span>
+          </button>
+        </div>
+
+        <div id="phone-outer" class="phone-outer">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <!-- Wallpaper -->
+            <div class="phone-wallpaper" id="phone-wallpaper"></div>
+            <!-- Status -->
+            <div class="phone-status">
+              <span id="phone-time">9:41</span>
+              <div class="phone-status-right">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <span>100%</span>
+              </div>
+            </div>
+            <!-- Date -->
+            <div class="phone-date-widget">
+              <div class="phone-date-pill">
+                <i class="fa-regular fa-calendar"></i>
+                <span id="phone-date-text">SAT 30.5</span>
+              </div>
+            </div>
+            <!-- Weather widget -->
+            <div class="phone-weather-widget" onclick="openWeatherModal()">
+              <div>
+                <div class="phone-weather-temp">18°</div>
+                <div class="phone-weather-info" id="weather-loc-text">Helsinki · <span data-i18n="cloudy"></span></div>
+              </div>
+              <div class="phone-weather-icon">⛅</div>
+            </div>
+            <!-- Icons -->
+            <div class="phone-icons-grid" id="icons-grid"><!-- JS --></div>
+            <!-- Dock -->
+            <div class="phone-dock" id="phone-dock"><!-- JS --></div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px;text-align:center;font-size:11px;color:var(--text3)">
+          <span data-i18n="tapToChange"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Info & Wallpapers -->
+    <div class="col-right">
+
+      <!-- Current Setup Info -->
+      <div class="card">
+        <div class="card-label" data-i18n="currentSetup"></div>
+        <div id="setup-info"><!-- JS --></div>
+      </div>
+
+      <!-- Wallpapers -->
+      <div class="card">
+        <div class="card-label">
+          <span data-i18n="wallpapers"></span>
+          <button onclick="showAllWallpapers()" style="font-size:11px;color:var(--text3);font-family:var(--mono);cursor:pointer" data-i18n="viewAll"></button>
+        </div>
+        <div class="wallpaper-grid" id="wallpaper-grid"><!-- JS --></div>
+      </div>
+
+      <!-- Style DNA -->
+      <div class="dna-card" onclick="openStyleQuiz()">
+        <div class="dna-icon"><i class="fa-solid fa-dna"></i></div>
+        <div>
+          <div class="dna-title" data-i18n="styleDna"></div>
+          <div class="dna-sub" data-i18n="styleDnaSub"></div>
+        </div>
+        <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:var(--text3);font-size:12px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <button class="btn-primary" onclick="saveCurrentSetup()">
+      <i class="fa-solid fa-floppy-disk"></i>
+      <span data-i18n="saveSetup"></span>
+    </button>
+    <button class="btn-secondary" onclick="showSavedSetups()">
+      <i class="fa-solid fa-folder-open"></i>
+      <span data-i18n="mySetups"></span>
+    </button>
+    <span class="bottom-note" data-i18n="pwaBadge"></span>
+  </div>
+
+</main>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Icon Picker -->
+<div class="modal-overlay" id="icon-modal">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" data-i18n="changeIcon"></div>
+        <div class="modal-sub" id="icon-modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('icon-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="icon-picker-grid" id="icon-picker-grid"><!-- JS --></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" style="padding:8px 16px;font-size:13px" onclick="closeModal('icon-modal')" data-i18n="cancel"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Style Quiz -->
+<div class="modal-overlay" id="quiz-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:520px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" style="font-style:italic">Style DNA</div>
+        <div class="modal-sub" data-i18n="personalityTest"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('quiz-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="quiz-body"><!-- JS --></div>
+    <div class="modal-footer" id="quiz-footer" style="justify-content:space-between">
+      <button class="btn-secondary" style="padding:8px 16px;font-size:13px" id="quiz-prev" onclick="prevQ()">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--text3)" id="quiz-progress-label">1 / 6</div>
+      <button class="btn-primary" style="padding:8px 16px;font-size:13px" id="quiz-next" onclick="nextQ()">
+        <span id="quiz-next-text" data-i18n="next"></span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- All Wallpapers Modal -->
+<div class="modal-overlay" id="wallpapers-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="allWallpapers"></div>
+      <button class="modal-close" onclick="closeModal('wallpapers-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="all-wallpapers-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px"><!-- JS --></div>
+    </div>
+  </div>
+</div>
+
+<!-- Saved Setups Modal -->
+<div class="modal-overlay" id="setups-modal">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" data-i18n="savedSetups"></div>
+      <button class="modal-close" onclick="closeModal('setups-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="setups-list"><!-- JS --></div>
+  </div>
+</div>
+
+<!-- AI Advisor Modal -->
+<div class="modal-overlay" id="ai-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">AI Advisor</div>
+        <div class="modal-sub">Powered by Claude</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('ai-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="ai-modal-body"><!-- JS --></div>
+  </div>
+</div>
+
+<!-- Weather Modal -->
+<div class="modal-overlay" id="weather-modal">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:320px">
+    <div class="modal-header">
+      <div class="modal-title">⛅ Helsinki</div>
+      <button class="modal-close" onclick="closeModal('weather-modal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <div style="font-size:72px;margin-bottom:4px">⛅</div>
+      <div style="font-size:52px;font-weight:300;font-family:var(--serif)">18°C</div>
+      <div style="color:var(--text2);margin-bottom:20px" data-i18n="cloudy"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div style="background:var(--bg3);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px" data-i18n="today"></div>
+          <div style="font-family:var(--mono);font-size:13px">19° / 12°</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px" data-i18n="tomorrow"></div>
+          <div style="font-family:var(--mono);font-size:13px">21° / 9°</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:4px" data-i18n="friday"></div>
+          <div style="font-family:var(--mono);font-size:13px">23° / 14°</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+// ============================================================
+//  TRANSLATIONS
+// ============================================================
+const i18n = {
+  en: {
+    days: 'days', install: 'Install', dailyChallenge: 'DAILY CHALLENGE',
+    challengeText: 'Build a "Quiet Luxury" screen (max 4 icons, brass palette)',
+    startBuilding: 'Start Building', themes: 'THEMES', quickActions: 'QUICK ACTIONS',
+    randomize: 'Randomize Setup', reset: 'Restore Defaults', aiAdvisor: 'AI Style Advisor',
+    saveImage: 'Save Image', share: 'Share', tapToChange: 'Tap an icon to change it',
+    currentSetup: 'CURRENT SETUP', wallpapers: 'WALLPAPERS', viewAll: 'All →',
+    styleDna: 'Discover Your Style DNA', styleDnaSub: '60-second personality test',
+    saveSetup: 'Save This Setup', mySetups: 'My Setups',
+    pwaBadge: 'Full PWA · Works Offline · Installable',
+    changeIcon: 'Change Icon', cancel: 'Cancel', personalityTest: 'PERSONALITY TEST',
+    next: 'Next', finish: 'Show Result', allWallpapers: 'All Wallpapers',
+    savedSetups: 'My Saved Setups', theme: 'Theme', wallpaper: 'Wallpaper',
+    icons: 'Icons', cloudy: 'Cloudy', today: 'Today', tomorrow: 'Tomorrow', friday: 'Friday',
+    noSetups: 'No saved setups yet. Create one!',
+    setupSaved: 'Setup saved!', setupLoaded: 'Setup loaded!',
+    randomized: 'Randomized ✨', resetDone: 'Restored to defaults',
+    challengeDone: 'Challenge complete! +120 XP 🎉',
+    installTip: 'Use Share → "Add to Home Screen" on iOS, or the browser menu on Android',
+    aiThinking: 'Analyzing your style…',
+    enterName: 'What\'s your name?',
+    saveSetupName: 'Name this setup:',
+    selectOption: 'Please select an option first',
+    quizDone: 'Quiz complete! +95 XP',
+    applyTheme: 'Apply This Theme', noThanks: 'No Thanks',
+    yourStyleIs: 'Your style is',
+  },
+  fi: {
+    days: 'päivää', install: 'Asenna', dailyChallenge: 'PÄIVÄN HAASTE',
+    challengeText: 'Rakenna "Quiet Luxury" -näyttö (max 4 ikonia, messinki)',
+    startBuilding: 'Aloita rakentaminen', themes: 'TEEMAT', quickActions: 'PIKATOIMINNOT',
+    randomize: 'Satunnaista asetukset', reset: 'Palauta oletus', aiAdvisor: 'AI-tyyliopas',
+    saveImage: 'Tallenna kuva', share: 'Jaa', tapToChange: 'Kosketa ikonia vaihtaaksesi',
+    currentSetup: 'NYKYINEN ASETUS', wallpapers: 'TAUSTAKUVAT', viewAll: 'Kaikki →',
+    styleDna: 'Löydä tyylisi DNA', styleDnaSub: '60 sekunnin persoonallisuustesti',
+    saveSetup: 'Tallenna tämä asetus', mySetups: 'Omat asetukset',
+    pwaBadge: 'Täysi PWA · Toimii offline · Asennettavissa',
+    changeIcon: 'Vaihda ikoni', cancel: 'Peruuta', personalityTest: 'PERSOONALLISUUSTESTI',
+    next: 'Seuraava', finish: 'Näytä tulos', allWallpapers: 'Kaikki taustakuvat',
+    savedSetups: 'Tallennetut asetukset', theme: 'Teema', wallpaper: 'Tausta',
+    icons: 'Ikonit', cloudy: 'Pilvinen', today: 'Tänään', tomorrow: 'Huomenna', friday: 'Pe',
+    noSetups: 'Ei vielä tallennettuja asetuksia.',
+    setupSaved: 'Asetus tallennettu!', setupLoaded: 'Asetus ladattu!',
+    randomized: 'Satunnaistettu ✨', resetDone: 'Palautettu oletusasetuksiin',
+    challengeDone: 'Haaste suoritettu! +120 XP 🎉',
+    installTip: 'iOS: Jaa → "Lisää aloitusnäyttöön". Android: selainvalikosta',
+    aiThinking: 'Analysoidaan tyyliäsi…',
+    enterName: 'Mikä on nimesi?', saveSetupName: 'Anna asetukselle nimi:',
+    selectOption: 'Valitse ensin vaihtoehto',
+    quizDone: 'Kysely valmis! +95 XP',
+    applyTheme: 'Ota käyttöön', noThanks: 'Ei kiitos',
+    yourStyleIs: 'Tyylisi on',
+  },
+  sv: {
+    days: 'dagar', install: 'Installera', dailyChallenge: 'DAGENS UTMANING',
+    challengeText: 'Bygg en "Quiet Luxury"-skärm (max 4 ikoner, mässingspalett)',
+    startBuilding: 'Börja bygga', themes: 'TEMAN', quickActions: 'SNABBÅTGÄRDER',
+    randomize: 'Slumpa inställningar', reset: 'Återställ standard', aiAdvisor: 'AI-stilrådgivare',
+    saveImage: 'Spara bild', share: 'Dela', tapToChange: 'Tryck på en ikon för att ändra',
+    currentSetup: 'NUVARANDE INSTÄLLNING', wallpapers: 'BAKGRUNDSBILDER', viewAll: 'Alla →',
+    styleDna: 'Hitta ditt stil-DNA', styleDnaSub: '60 sekunders personlighetstest',
+    saveSetup: 'Spara denna inställning', mySetups: 'Mina inställningar',
+    pwaBadge: 'Full PWA · Fungerar offline · Installerbar',
+    changeIcon: 'Byt ikon', cancel: 'Avbryt', personalityTest: 'PERSONLIGHETSTEST',
+    next: 'Nästa', finish: 'Visa resultat', allWallpapers: 'Alla bakgrunder',
+    savedSetups: 'Sparade inställningar', theme: 'Tema', wallpaper: 'Bakgrund',
+    icons: 'Ikoner', cloudy: 'Molnigt', today: 'Idag', tomorrow: 'Imorgon', friday: 'Fre',
+    noSetups: 'Inga sparade inställningar ännu.',
+    setupSaved: 'Inställning sparad!', setupLoaded: 'Inställning laddad!',
+    randomized: 'Slumpad ✨', resetDone: 'Återställd till standard',
+    challengeDone: 'Utmaning klar! +120 XP 🎉',
+    installTip: 'iOS: Dela → "Lägg till på hemskärm". Android: webbläsarmenyn',
+    aiThinking: 'Analyserar din stil…', enterName: 'Vad heter du?',
+    saveSetupName: 'Namnge denna inställning:', selectOption: 'Välj ett alternativ först',
+    quizDone: 'Quiz klar! +95 XP', applyTheme: 'Tillämpa tema', noThanks: 'Nej tack',
+    yourStyleIs: 'Din stil är',
+  },
+  de: {
+    days: 'Tage', install: 'Installieren', dailyChallenge: 'TÄGLICHE AUFGABE',
+    challengeText: '"Quiet Luxury"-Bildschirm bauen (max 4 Icons, Messing-Palette)',
+    startBuilding: 'Starten', themes: 'THEMEN', quickActions: 'SCHNELLAKTIONEN',
+    randomize: 'Zufällige Einstellung', reset: 'Standard wiederherstellen', aiAdvisor: 'KI-Stilberater',
+    saveImage: 'Bild speichern', share: 'Teilen', tapToChange: 'Icon antippen zum Ändern',
+    currentSetup: 'AKTUELLE EINSTELLUNG', wallpapers: 'HINTERGRUNDBILDER', viewAll: 'Alle →',
+    styleDna: 'Entdecke deine Stil-DNA', styleDnaSub: '60-Sekunden-Persönlichkeitstest',
+    saveSetup: 'Einstellung speichern', mySetups: 'Meine Einstellungen',
+    pwaBadge: 'Volle PWA · Offline · Installierbar',
+    changeIcon: 'Icon ändern', cancel: 'Abbrechen', personalityTest: 'PERSÖNLICHKEITSTEST',
+    next: 'Weiter', finish: 'Ergebnis zeigen', allWallpapers: 'Alle Hintergründe',
+    savedSetups: 'Gespeicherte Einstellungen', theme: 'Thema', wallpaper: 'Hintergrund',
+    icons: 'Icons', cloudy: 'Bewölkt', today: 'Heute', tomorrow: 'Morgen', friday: 'Fr.',
+    noSetups: 'Noch keine gespeicherten Einstellungen.',
+    setupSaved: 'Einstellung gespeichert!', setupLoaded: 'Einstellung geladen!',
+    randomized: 'Zufällig ✨', resetDone: 'Standard wiederhergestellt',
+    challengeDone: 'Aufgabe erledigt! +120 XP 🎉',
+    installTip: 'iOS: Teilen → "Zum Home-Bildschirm". Android: Browsermenü',
+    aiThinking: 'Stil wird analysiert…', enterName: 'Wie heißt du?',
+    saveSetupName: 'Einstellung benennen:', selectOption: 'Bitte zuerst eine Option wählen',
+    quizDone: 'Quiz abgeschlossen! +95 XP', applyTheme: 'Thema anwenden', noThanks: 'Nein danke',
+    yourStyleIs: 'Dein Stil ist',
+  },
+  es: {
+    days: 'días', install: 'Instalar', dailyChallenge: 'RETO DIARIO',
+    challengeText: 'Crea una pantalla "Quiet Luxury" (max 4 iconos, paleta latón)',
+    startBuilding: 'Empezar', themes: 'TEMAS', quickActions: 'ACCIONES RÁPIDAS',
+    randomize: 'Aleatorizar', reset: 'Restaurar por defecto', aiAdvisor: 'Asesor de estilo IA',
+    saveImage: 'Guardar imagen', share: 'Compartir', tapToChange: 'Toca un icono para cambiarlo',
+    currentSetup: 'CONFIGURACIÓN ACTUAL', wallpapers: 'FONDOS DE PANTALLA', viewAll: 'Ver todo →',
+    styleDna: 'Descubre tu ADN de estilo', styleDnaSub: 'Test de personalidad de 60 segundos',
+    saveSetup: 'Guardar esta configuración', mySetups: 'Mis configuraciones',
+    pwaBadge: 'PWA completa · Funciona offline · Instalable',
+    changeIcon: 'Cambiar icono', cancel: 'Cancelar', personalityTest: 'TEST DE PERSONALIDAD',
+    next: 'Siguiente', finish: 'Ver resultado', allWallpapers: 'Todos los fondos',
+    savedSetups: 'Configuraciones guardadas', theme: 'Tema', wallpaper: 'Fondo',
+    icons: 'Iconos', cloudy: 'Nublado', today: 'Hoy', tomorrow: 'Mañana', friday: 'Vie',
+    noSetups: 'Sin configuraciones guardadas aún.',
+    setupSaved: '¡Configuración guardada!', setupLoaded: '¡Configuración cargada!',
+    randomized: 'Aleatorizado ✨', resetDone: 'Restaurado a valores predeterminados',
+    challengeDone: '¡Reto completado! +120 XP 🎉',
+    installTip: 'iOS: Compartir → "Añadir a pantalla de inicio". Android: menú del navegador',
+    aiThinking: 'Analizando tu estilo…', enterName: '¿Cuál es tu nombre?',
+    saveSetupName: 'Nombre para esta configuración:', selectOption: 'Selecciona una opción primero',
+    quizDone: 'Quiz completado! +95 XP', applyTheme: 'Aplicar tema', noThanks: 'No gracias',
+    yourStyleIs: 'Tu estilo es',
+  },
+  fr: {
+    days: 'jours', install: 'Installer', dailyChallenge: 'DÉFI DU JOUR',
+    challengeText: 'Créez un écran "Quiet Luxury" (max 4 icônes, palette laiton)',
+    startBuilding: 'Commencer', themes: 'THÈMES', quickActions: 'ACTIONS RAPIDES',
+    randomize: 'Aléatoire', reset: 'Réinitialiser', aiAdvisor: 'Conseiller de style IA',
+    saveImage: 'Sauvegarder', share: 'Partager', tapToChange: 'Touchez une icône pour la changer',
+    currentSetup: 'CONFIGURATION ACTUELLE', wallpapers: 'FONDS D\'ÉCRAN', viewAll: 'Tout voir →',
+    styleDna: 'Découvrez votre ADN de style', styleDnaSub: 'Test de personnalité en 60 secondes',
+    saveSetup: 'Sauvegarder cette configuration', mySetups: 'Mes configurations',
+    pwaBadge: 'PWA complète · Hors ligne · Installable',
+    changeIcon: 'Changer l\'icône', cancel: 'Annuler', personalityTest: 'TEST DE PERSONNALITÉ',
+    next: 'Suivant', finish: 'Voir le résultat', allWallpapers: 'Tous les fonds',
+    savedSetups: 'Configurations sauvegardées', theme: 'Thème', wallpaper: 'Fond d\'écran',
+    icons: 'Icônes', cloudy: 'Nuageux', today: 'Aujourd\'hui', tomorrow: 'Demain', friday: 'Ven',
+    noSetups: 'Pas encore de configurations sauvegardées.',
+    setupSaved: 'Configuration sauvegardée !', setupLoaded: 'Configuration chargée !',
+    randomized: 'Aléatoire ✨', resetDone: 'Réinitialisé par défaut',
+    challengeDone: 'Défi accompli ! +120 XP 🎉',
+    installTip: 'iOS : Partager → "Sur l\'écran d\'accueil". Android : menu du navigateur',
+    aiThinking: 'Analyse de votre style…', enterName: 'Quel est votre prénom ?',
+    saveSetupName: 'Nommez cette configuration :', selectOption: 'Choisissez d\'abord une option',
+    quizDone: 'Quiz terminé ! +95 XP', applyTheme: 'Appliquer le thème', noThanks: 'Non merci',
+    yourStyleIs: 'Votre style est',
+  },
+  ja: {
+    days: '日', install: 'インストール', dailyChallenge: 'デイリーチャレンジ',
+    challengeText: '「Quiet Luxury」画面を作ろう（最大4アイコン、真鍮パレット）',
+    startBuilding: '始める', themes: 'テーマ', quickActions: 'クイックアクション',
+    randomize: 'ランダム化', reset: 'デフォルトに戻す', aiAdvisor: 'AIスタイルアドバイザー',
+    saveImage: '画像を保存', share: '共有', tapToChange: 'アイコンをタップして変更',
+    currentSetup: '現在の設定', wallpapers: '壁紙', viewAll: 'すべて →',
+    styleDna: 'スタイルDNAを発見', styleDnaSub: '60秒パーソナリティテスト',
+    saveSetup: 'この設定を保存', mySetups: 'マイ設定',
+    pwaBadge: 'フルPWA · オフライン · インストール可能',
+    changeIcon: 'アイコンを変更', cancel: 'キャンセル', personalityTest: 'パーソナリティテスト',
+    next: '次へ', finish: '結果を見る', allWallpapers: 'すべての壁紙',
+    savedSetups: '保存した設定', theme: 'テーマ', wallpaper: '壁紙',
+    icons: 'アイコン', cloudy: '曇り', today: '今日', tomorrow: '明日', friday: '金',
+    noSetups: '保存した設定はまだありません。',
+    setupSaved: '設定を保存しました！', setupLoaded: '設定を読み込みました！',
+    randomized: 'ランダム化 ✨', resetDone: 'デフォルトに戻しました',
+    challengeDone: 'チャレンジ完了！+120 XP 🎉',
+    installTip: 'iOS: 共有 → 「ホーム画面に追加」。Android: ブラウザメニュー',
+    aiThinking: 'スタイルを分析中…', enterName: 'お名前は？',
+    saveSetupName: 'この設定の名前：', selectOption: '先にオプションを選択してください',
+    quizDone: 'クイズ完了！+95 XP', applyTheme: 'テーマを適用', noThanks: 'いいえ',
+    yourStyleIs: 'あなたのスタイルは',
+  },
+  pt: {
+    days: 'dias', install: 'Instalar', dailyChallenge: 'DESAFIO DIÁRIO',
+    challengeText: 'Crie uma tela "Quiet Luxury" (max 4 ícones, paleta bronze)',
+    startBuilding: 'Começar', themes: 'TEMAS', quickActions: 'AÇÕES RÁPIDAS',
+    randomize: 'Aleatorizar', reset: 'Restaurar padrão', aiAdvisor: 'Consultor de estilo IA',
+    saveImage: 'Salvar imagem', share: 'Compartilhar', tapToChange: 'Toque num ícone para mudar',
+    currentSetup: 'CONFIGURAÇÃO ATUAL', wallpapers: 'PAPÉIS DE PAREDE', viewAll: 'Ver tudo →',
+    styleDna: 'Descubra seu DNA de estilo', styleDnaSub: 'Teste de personalidade de 60 segundos',
+    saveSetup: 'Salvar esta configuração', mySetups: 'Minhas configurações',
+    pwaBadge: 'PWA completo · Funciona offline · Instalável',
+    changeIcon: 'Mudar ícone', cancel: 'Cancelar', personalityTest: 'TESTE DE PERSONALIDADE',
+    next: 'Próximo', finish: 'Ver resultado', allWallpapers: 'Todos os fundos',
+    savedSetups: 'Configurações salvas', theme: 'Tema', wallpaper: 'Papel de parede',
+    icons: 'Ícones', cloudy: 'Nublado', today: 'Hoje', tomorrow: 'Amanhã', friday: 'Sex',
+    noSetups: 'Nenhuma configuração salva ainda.',
+    setupSaved: 'Configuração salva!', setupLoaded: 'Configuração carregada!',
+    randomized: 'Aleatorizado ✨', resetDone: 'Restaurado ao padrão',
+    challengeDone: 'Desafio concluído! +120 XP 🎉',
+    installTip: 'iOS: Compartilhar → "Adicionar à Tela Inicial". Android: menu do navegador',
+    aiThinking: 'Analisando seu estilo…', enterName: 'Qual é o seu nome?',
+    saveSetupName: 'Nome para esta configuração:', selectOption: 'Selecione uma opção primeiro',
+    quizDone: 'Quiz concluído! +95 XP', applyTheme: 'Aplicar tema', noThanks: 'Não obrigado',
+    yourStyleIs: 'Seu estilo é',
+  }
+};
+
+const langFlags = { en:'🇬🇧', fi:'🇫🇮', sv:'🇸🇪', de:'🇩🇪', es:'🇪🇸', fr:'🇫🇷', ja:'🇯🇵', pt:'🇧🇷' };
+
+let currentLang = 'en';
+function t(key) { return (i18n[currentLang] || i18n.en)[key] || i18n.en[key] || key; }
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  document.getElementById('lang-flag').textContent = langFlags[currentLang];
+  document.querySelectorAll('.lang-option').forEach(el => {
+    el.classList.toggle('active', el.dataset.lang === currentLang);
+  });
+  updateCurrentSetupInfo();
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  localStorage.setItem('df_lang', lang);
+  applyTranslations();
+  closeLangMenu();
+  renderWallpaperGrid();
+  renderThemeList();
+  updateCurrentSetupInfo();
+}
+
+function toggleLangMenu() {
+  document.getElementById('lang-dropdown').classList.toggle('open');
+}
+function closeLangMenu() {
+  document.getElementById('lang-dropdown').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#lang-btn') && !e.target.closest('#lang-dropdown')) closeLangMenu();
+});
+
+// ============================================================
+//  DATA
+// ============================================================
+const themes = [
+  { id:'luxury',      name:'Quiet Luxury',  icon:'fa-gem',            color:'#c8b67a', desc:'Brass & ivory' },
+  { id:'minimal',     name:'Minimal',       icon:'fa-minus',           color:'#888899', desc:'Pure & calm' },
+  { id:'dark',        name:'Dark Mode',     icon:'fa-moon',            color:'#3b3b55', desc:'Deep black' },
+  { id:'cyberpunk',   name:'Cyberpunk',     icon:'fa-robot',           color:'#22d3ee', desc:'Neon & magenta' },
+  { id:'glass',       name:'Glass',         icon:'fa-window-maximize', color:'#bae6fd', desc:'Frosted pane' },
+  { id:'y2k',         name:'Y2K',           icon:'fa-globe',           color:'#f472b6', desc:'Metal & pink' },
+  { id:'clean',       name:'Clean',         icon:'fa-leaf',            color:'#86efac', desc:'Fresh & light' },
+  { id:'warm',        name:'Warm Minimal',  icon:'fa-sun',             color:'#fb923c', desc:'Warm beige' },
+  { id:'neon',        name:'Neon Pulse',    icon:'fa-bolt',            color:'#ff00ff', desc:'Electric & vivid' },
+  { id:'marble',      name:'Marble',        icon:'fa-circle',          color:'#d4cfc9', desc:'Stone & elegant' },
+  { id:'sakura',      name:'Sakura',        icon:'fa-pagelines',       color:'#ffb7c5', desc:'Soft cherry blossom' },
+  { id:'arctic',      name:'Arctic',        icon:'fa-snowflake',       color:'#a8d8ea', desc:'Icy & crisp' },
+  { id:'brutalist',   name:'Brutalist',     icon:'fa-square',          color:'#e8e800', desc:'Raw & bold' },
+  { id:'cottagecore', name:'Cottagecore',   icon:'fa-seedling',        color:'#a3b899', desc:'Nature & cozy' },
+  { id:'midnight',    name:'Midnight',      icon:'fa-star',            color:'#7c6af5', desc:'Deep violet night' },
+  { id:'desert',      name:'Desert Sand',   icon:'fa-sun',             color:'#d4956a', desc:'Warm terracotta' }
+];
+
+const wallpapers = [
+  { id:0,  name:'Aurora',      css:'linear-gradient(135deg,#0f172a 0%,#1e3a8a 40%,#312e81 100%)' },
+  { id:1,  name:'Liquid',      css:'linear-gradient(160deg,#164e63 0%,#0e7490 50%,#155e75 100%)' },
+  { id:2,  name:'Nocturne',    css:'linear-gradient(145deg,#111827 0%,#1e2937 100%)' },
+  { id:3,  name:'Prism',       css:'linear-gradient(120deg,#312e81 0%,#581c87 50%,#831843 100%)' },
+  { id:4,  name:'Vapor',       css:'linear-gradient(135deg,#1e2937 0%,#334155 100%)' },
+  { id:5,  name:'Halo',        css:'linear-gradient(155deg,#1e3a8a 0%,#312e81 70%,#4c1d95 100%)' },
+  { id:6,  name:'Drift',       css:'linear-gradient(140deg,#134e4b 0%,#0f766e 60%,#115e59 100%)' },
+  { id:7,  name:'Glow',        css:'linear-gradient(130deg,#713f12 0%,#854d0e 50%,#713f12 100%)' },
+  { id:8,  name:'Frost',       css:'linear-gradient(150deg,#0c4a6e 0%,#164e63 100%)' },
+  { id:9,  name:'Ember',       css:'linear-gradient(120deg,#431407 0%,#78350f 100%)' },
+  { id:10, name:'Ocean',       css:'linear-gradient(145deg,#0e7490 0%,#164e63 100%)' },
+  { id:11, name:'Void',        css:'linear-gradient(180deg,#09090b 0%,#18181b 100%)' },
+  { id:12, name:'Neon City',   css:'linear-gradient(135deg,#0d0014 0%,#1a0030 40%,#0d0020 100%), radial-gradient(ellipse at 20% 50%,#ff00ff44 0%,transparent 60%), radial-gradient(ellipse at 80% 50%,#00ffff44 0%,transparent 60%)' },
+  { id:13, name:'Neon Sunset', css:'linear-gradient(160deg,#0a0010 0%,#2d0050 30%,#ff006622 60%,#ff00aa11 100%)' },
+  { id:14, name:'Electric',    css:'linear-gradient(120deg,#000814 0%,#001233 50%,#0077b6 100%)' },
+  { id:15, name:'Plasma',      css:'linear-gradient(135deg,#10002b 0%,#3c096c 40%,#e0aaff22 100%)' },
+  { id:16, name:'Marble White',css:'linear-gradient(135deg,#f5f5f0 0%,#e8e4df 30%,#f0ede8 60%,#ddd8d0 100%)' },
+  { id:17, name:'Marble Dark', css:'linear-gradient(145deg,#1a1a1a 0%,#2d2d2d 30%,#1f1f1f 60%,#333 100%)' },
+  { id:18, name:'Marble Rose', css:'linear-gradient(135deg,#f8e8e8 0%,#ead5d5 30%,#f5e0e0 60%,#e8d0d0 100%)' },
+  { id:19, name:'Sakura',      css:'linear-gradient(145deg,#1a0a12 0%,#2d1020 40%,#ffb7c522 80%,#1a0a12 100%)' },
+  { id:20, name:'Arctic',      css:'linear-gradient(155deg,#e8f4fd 0%,#c9e8f5 40%,#a8d8ea 100%)' },
+  { id:21, name:'Desert',      css:'linear-gradient(135deg,#2c1a0e 0%,#5c3a1e 40%,#d4956a44 100%)' },
+  { id:22, name:'Midnight',    css:'linear-gradient(145deg,#0a0818 0%,#1a1035 50%,#0f0a24 100%)' },
+  { id:23, name:'Cottagecore', css:'linear-gradient(135deg,#1a2412 0%,#2d3d20 40%,#3d5030 100%)' }
+];
+
+const iconLibrary = [
+  { emoji:'✉️',  label:{en:'Messages',fi:'Viestit',sv:'Meddelanden',de:'Nachrichten',es:'Mensajes',fr:'Messages',ja:'メッセージ',pt:'Mensagens'}, color:'#3b82f6' },
+  { emoji:'📷',  label:{en:'Camera',fi:'Kamera',sv:'Kamera',de:'Kamera',es:'Cámara',fr:'Appareil photo',ja:'カメラ',pt:'Câmera'}, color:'#10b981' },
+  { emoji:'🎵',  label:{en:'Music',fi:'Musiikki',sv:'Musik',de:'Musik',es:'Música',fr:'Musique',ja:'音楽',pt:'Música'}, color:'#8b5cf6' },
+  { emoji:'🗺️',  label:{en:'Maps',fi:'Kartat',sv:'Kartor',de:'Karten',es:'Mapas',fr:'Plans',ja:'マップ',pt:'Mapas'}, color:'#f59e0b' },
+  { emoji:'🖼️',  label:{en:'Photos',fi:'Kuvat',sv:'Foton',de:'Fotos',es:'Fotos',fr:'Photos',ja:'写真',pt:'Fotos'}, color:'#ec4899' },
+  { emoji:'📝',  label:{en:'Notes',fi:'Muistiinpanot',sv:'Anteckningar',de:'Notizen',es:'Notas',fr:'Notes',ja:'メモ',pt:'Notas'}, color:'#eab308' },
+  { emoji:'⏰',  label:{en:'Clock',fi:'Kello',sv:'Klocka',de:'Uhr',es:'Reloj',fr:'Horloge',ja:'時計',pt:'Relógio'}, color:'#14b8a6' },
+  { emoji:'👛',  label:{en:'Wallet',fi:'Lompakko',sv:'Plånbok',de:'Geldbörse',es:'Cartera',fr:'Portefeuille',ja:'財布',pt:'Carteira'}, color:'#6366f1' },
+  { emoji:'📱',  label:{en:'Phone',fi:'Puhelin',sv:'Telefon',de:'Telefon',es:'Teléfono',fr:'Téléphone',ja:'電話',pt:'Telefone'}, color:'#64748b' },
+  { emoji:'💬',  label:{en:'Chat',fi:'Chat',sv:'Chatt',de:'Chat',es:'Chat',fr:'Tchat',ja:'チャット',pt:'Chat'}, color:'#22d3ee' },
+  { emoji:'🌤️',  label:{en:'Weather',fi:'Sää',sv:'Väder',de:'Wetter',es:'Clima',fr:'Météo',ja:'天気',pt:'Clima'}, color:'#fbbf24' },
+  { emoji:'📅',  label:{en:'Calendar',fi:'Kalenteri',sv:'Kalender',de:'Kalender',es:'Calendario',fr:'Calendrier',ja:'カレンダー',pt:'Calendário'}, color:'#f43f5e' },
+  { emoji:'🔍',  label:{en:'Search',fi:'Haku',sv:'Sök',de:'Suche',es:'Buscar',fr:'Recherche',ja:'検索',pt:'Busca'}, color:'#a78bfa' },
+  { emoji:'⚙️',  label:{en:'Settings',fi:'Asetukset',sv:'Inställningar',de:'Einstellungen',es:'Ajustes',fr:'Paramètres',ja:'設定',pt:'Configurações'}, color:'#64748b' },
+  { emoji:'❤️',  label:{en:'Health',fi:'Terveys',sv:'Hälsa',de:'Gesundheit',es:'Salud',fr:'Santé',ja:'健康',pt:'Saúde'}, color:'#f43f5e' },
+  { emoji:'🎮',  label:{en:'Games',fi:'Pelit',sv:'Spel',de:'Spiele',es:'Juegos',fr:'Jeux',ja:'ゲーム',pt:'Jogos'}, color:'#c026d3' },
+  { emoji:'📚',  label:{en:'Books',fi:'Kirjat',sv:'Böcker',de:'Bücher',es:'Libros',fr:'Livres',ja:'本',pt:'Livros'}, color:'#0ea5e9' },
+  { emoji:'✈️',  label:{en:'Travel',fi:'Matkailu',sv:'Resor',de:'Reisen',es:'Viajes',fr:'Voyage',ja:'旅行',pt:'Viagem'}, color:'#06b67f' },
+  { emoji:'🏋️',  label:{en:'Fitness',fi:'Liikunta',sv:'Fitness',de:'Fitness',es:'Fitness',fr:'Fitness',ja:'フィットネス',pt:'Fitness'}, color:'#f97316' },
+  { emoji:'🍎',  label:{en:'Food',fi:'Ruoka',sv:'Mat',de:'Essen',es:'Comida',fr:'Nourriture',ja:'食べ物',pt:'Comida'}, color:'#ef4444' },
+  { emoji:'🛍️',  label:{en:'Shopping',fi:'Ostokset',sv:'Shopping',de:'Einkaufen',es:'Compras',fr:'Shopping',ja:'ショッピング',pt:'Compras'}, color:'#f472b6' },
+  { emoji:'🎨',  label:{en:'Art',fi:'Taide',sv:'Konst',de:'Kunst',es:'Arte',fr:'Art',ja:'アート',pt:'Arte'}, color:'#e879f9' },
+  { emoji:'💰',  label:{en:'Finance',fi:'Raha',sv:'Ekonomi',de:'Finanzen',es:'Finanzas',fr:'Finances',ja:'お金',pt:'Finanças'}, color:'#22c55e' },
+  { emoji:'🎬',  label:{en:'Video',fi:'Video',sv:'Video',de:'Video',es:'Video',fr:'Vidéo',ja:'動画',pt:'Vídeo'}, color:'#ef4444' },
+  { emoji:'📡',  label:{en:'Podcast',fi:'Podcast',sv:'Podcast',de:'Podcast',es:'Podcast',fr:'Podcast',ja:'ポッドキャスト',pt:'Podcast'}, color:'#8b5cf6' },
+  { emoji:'🔔',  label:{en:'Alerts',fi:'Hälytykset',sv:'Aviseringar',de:'Benachrichtigungen',es:'Alertas',fr:'Alertes',ja:'通知',pt:'Alertas'}, color:'#f59e0b' },
+  { emoji:'🌙',  label:{en:'Sleep',fi:'Uni',sv:'Sömn',de:'Schlaf',es:'Sueño',fr:'Sommeil',ja:'睡眠',pt:'Sono'}, color:'#6366f1' },
+  { emoji:'🧘',  label:{en:'Mindfulness',fi:'Mindfulness',sv:'Mindfulness',de:'Achtsamkeit',es:'Mindfulness',fr:'Pleine conscience',ja:'マインドフルネス',pt:'Mindfulness'}, color:'#14b8a6' },
+  { emoji:'🚀',  label:{en:'Launch',fi:'Käynnistä',sv:'Starta',de:'Start',es:'Lanzar',fr:'Lancer',ja:'起動',pt:'Lançar'}, color:'#f97316' },
+  { emoji:'💡',  label:{en:'Ideas',fi:'Ideat',sv:'Idéer',de:'Ideen',es:'Ideas',fr:'Idées',ja:'アイデア',pt:'Ideias'}, color:'#fbbf24' },
+  { emoji:'🔐',  label:{en:'Security',fi:'Turvallisuus',sv:'Säkerhet',de:'Sicherheit',es:'Seguridad',fr:'Sécurité',ja:'セキュリティ',pt:'Segurança'}, color:'#10b981' },
+  { emoji:'☁️',  label:{en:'Cloud',fi:'Pilvi',sv:'Moln',de:'Cloud',es:'Nube',fr:'Nuage',ja:'クラウド',pt:'Nuvem'}, color:'#38bdf8' },
+  { emoji:'🎯',  label:{en:'Goals',fi:'Tavoitteet',sv:'Mål',de:'Ziele',es:'Metas',fr:'Objectifs',ja:'目標',pt:'Metas'}, color:'#f43f5e' },
+  { emoji:'🌿',  label:{en:'Nature',fi:'Luonto',sv:'Natur',de:'Natur',es:'Naturaleza',fr:'Nature',ja:'自然',pt:'Natureza'}, color:'#4ade80' },
+  { emoji:'🎭',  label:{en:'Events',fi:'Tapahtumat',sv:'Evenemang',de:'Veranstaltungen',es:'Eventos',fr:'Événements',ja:'イベント',pt:'Eventos'}, color:'#c026d3' },
+  { emoji:'🏠',  label:{en:'Home',fi:'Koti',sv:'Hem',de:'Zuhause',es:'Casa',fr:'Maison',ja:'ホーム',pt:'Casa'}, color:'#fb923c' },
+  { emoji:'🚗',  label:{en:'Drive',fi:'Ajo',sv:'Kör',de:'Fahren',es:'Conducir',fr:'Conduire',ja:'ドライブ',pt:'Dirigir'}, color:'#64748b' },
+  { emoji:'📊',  label:{en:'Stats',fi:'Tilastot',sv:'Statistik',de:'Statistik',es:'Estadísticas',fr:'Statistiques',ja:'統計',pt:'Estatísticas'}, color:'#3b82f6' },
+  { emoji:'🤖',  label:{en:'AI',fi:'Tekoäly',sv:'AI',de:'KI',es:'IA',fr:'IA',ja:'AI',pt:'IA'}, color:'#22d3ee' },
+  { emoji:'🌸',  label:{en:'Sakura',fi:'Kirsikka',sv:'Körsbär',de:'Kirsche',es:'Cerezo',fr:'Cerisier',ja:'桜',pt:'Cerejeira'}, color:'#ffb7c5' },
+  { emoji:'💎',  label:{en:'Premium',fi:'Premium',sv:'Premium',de:'Premium',es:'Premium',fr:'Premium',ja:'プレミアム',pt:'Premium'}, color:'#c8b67a' },
+  { emoji:'🔮',  label:{en:'Magic',fi:'Taikuus',sv:'Magi',de:'Magie',es:'Magia',fr:'Magie',ja:'魔法',pt:'Magia'}, color:'#7c3aed' }
+];
+
+function iconLabel(icon) {
+  if (typeof icon.label === 'string') return icon.label;
+  return icon.label[currentLang] || icon.label.en;
+}
+
+const defaultIcons = iconLibrary.slice(0, 8).map((lib, i) => ({ ...lib, id: i }));
+
+// Quiz questions
+const quizQuestions = [
+  {
+    q: { en:"Which aesthetic appeals to you most?", fi:"Mikä estetiikka vetoaa sinuun eniten?", sv:"Vilken estetik tilltalar dig mest?", de:"Welche Ästhetik spricht dich am meisten an?", es:"¿Qué estética te atrae más?", fr:"Quelle esthétique vous attire le plus?", ja:"どんな美学が最も魅力的ですか？", pt:"Qual estética te atrai mais?" },
+    options: [
+      { t:{en:"Minimalist & calm",fi:"Minimalistinen & rauhallinen",sv:"Minimalistisk & lugn",de:"Minimalistisch & ruhig",es:"Minimalista & calmado",fr:"Minimaliste & calme",ja:"ミニマリスト＆穏やか",pt:"Minimalista & calmo"}, score:{minimal:3,clean:2} },
+      { t:{en:"Luxury & elegant",fi:"Luksus & elegantti",sv:"Lyx & elegant",de:"Luxus & elegant",es:"Lujo & elegante",fr:"Luxe & élégant",ja:"ラグジュアリー＆エレガント",pt:"Luxo & elegante"}, score:{luxury:3,warm:1} },
+      { t:{en:"Futuristic & neon",fi:"Futuristinen & neon",sv:"Futuristisk & neon",de:"Futuristisch & neon",es:"Futurista & neón",fr:"Futuriste & néon",ja:"未来的＆ネオン",pt:"Futurista & neon"}, score:{cyberpunk:3,glass:1} },
+      { t:{en:"Retro & playful (Y2K)",fi:"Retro & leikkisä (Y2K)",sv:"Retro & lekfull (Y2K)",de:"Retro & verspielt (Y2K)",es:"Retro & lúdico (Y2K)",fr:"Rétro & ludique (Y2K)",ja:"レトロ＆遊び心 (Y2K)",pt:"Retrô & divertido (Y2K)"}, score:{y2k:3,dark:1} }
+    ]
+  },
+  {
+    q: { en:"How should your home screen feel?", fi:"Miltä kotinäyttösi pitäisi tuntua?", sv:"Hur ska din hemskärm kännas?", de:"Wie soll sich dein Startbildschirm anfühlen?", es:"¿Cómo debería sentirse tu pantalla de inicio?", fr:"Comment votre écran d'accueil devrait-il sembler?", ja:"ホーム画面の雰囲気は？", pt:"Como sua tela inicial deve parecer?" },
+    options: [
+      { t:{en:"Calm & organized",fi:"Tyyneltä ja järjestelmälliseltä",sv:"Lugn & organiserad",de:"Ruhig & organisiert",es:"Calmada & organizada",fr:"Calme & organisé",ja:"穏やかで整然と",pt:"Calma & organizada"}, score:{minimal:3,clean:2} },
+      { t:{en:"Warm & cozy",fi:"Lämpimältä ja kutsuvalta",sv:"Varm & mysig",de:"Warm & gemütlich",es:"Cálida & acogedora",fr:"Chaud & accueillant",ja:"暖かく居心地よく",pt:"Quente & aconchegante"}, score:{warm:3,luxury:1} },
+      { t:{en:"Energetic & modern",fi:"Energiakkaalta ja modernilta",sv:"Energisk & modern",de:"Energisch & modern",es:"Energética & moderna",fr:"Énergique & moderne",ja:"エネルギッシュでモダン",pt:"Energética & moderna"}, score:{cyberpunk:2,glass:2} },
+      { t:{en:"Dark & immersive",fi:"Tummalta ja syvältä",sv:"Mörk & uppslukande",de:"Dunkel & immersiv",es:"Oscura & envolvente",fr:"Sombre & immersif",ja:"暗く没入的に",pt:"Escura & imersiva"}, score:{dark:3,cyberpunk:1} }
+    ]
+  },
+  {
+    q: { en:"How many apps do you want visible?", fi:"Kuinka monta sovellusta haluat näkyville?", sv:"Hur många appar vill du ha synliga?", de:"Wie viele Apps möchtest du sehen?", es:"¿Cuántas apps quieres visibles?", fr:"Combien d'applications voulez-vous visibles?", ja:"表示したいアプリの数は？", pt:"Quantos apps você quer visíveis?" },
+    options: [
+      { t:{en:"Only 4–6 essentials",fi:"Vain 4–6 tärkeintä",sv:"Bara 4–6 väsentliga",de:"Nur 4–6 Wesentliches",es:"Solo 4–6 esenciales",fr:"Seulement 4 à 6 essentiels",ja:"4〜6個の必須アプリ",pt:"Apenas 4–6 essenciais"}, score:{minimal:3,luxury:2} },
+      { t:{en:"8–12 apps diversely",fi:"8–12 monipuolisesti",sv:"8–12 mångsidigt",de:"8–12 vielseitig",es:"8–12 apps diversamente",fr:"8 à 12 apps diversement",ja:"8〜12個を多様に",pt:"8–12 apps diversamente"}, score:{clean:2,y2k:1} },
+      { t:{en:"As few as possible",fi:"Mahdollisimman vähän",sv:"Så få som möjligt",de:"So wenig wie möglich",es:"Lo menos posible",fr:"Le moins possible",ja:"できるだけ少なく",pt:"O mínimo possível"}, score:{minimal:3,dark:1} },
+      { t:{en:"Visually rich",fi:"Visuaalisesti runsas",sv:"Visuellt rik",de:"Visuell reich",es:"Visualmente rico",fr:"Visuellement riche",ja:"視覚的に豊か",pt:"Visualmente rico"}, score:{glass:2,cyberpunk:2} }
+    ]
+  },
+  {
+    q: { en:"Favorite color palette?", fi:"Mikä väripaletti on suosikkisi?", sv:"Favoritfärgpalett?", de:"Lieblingsfarbenpalette?", es:"¿Tu paleta de colores favorita?", fr:"Palette de couleurs préférée?", ja:"好きなカラーパレットは？", pt:"Paleta de cores favorita?" },
+    options: [
+      { t:{en:"Gold, ivory, white",fi:"Kulta, beige, valkoinen",sv:"Guld, elfenben, vit",de:"Gold, Elfenbein, Weiß",es:"Oro, marfil, blanco",fr:"Or, ivoire, blanc",ja:"ゴールド、アイボリー、ホワイト",pt:"Ouro, marfim, branco"}, score:{luxury:3,warm:2} },
+      { t:{en:"Black, white & grey",fi:"Mustavalkoinen & harmaa",sv:"Svartvitt & grå",de:"Schwarz, Weiß & Grau",es:"Blanco, negro & gris",fr:"Noir, blanc & gris",ja:"白黒とグレー",pt:"Preto, branco & cinza"}, score:{minimal:3,dark:2} },
+      { t:{en:"Neon green & magenta",fi:"Neonvihreä & magenta",sv:"Neongrönt & magenta",de:"Neongrün & Magenta",es:"Verde neón & magenta",fr:"Vert néon & magenta",ja:"ネオングリーン＆マゼンタ",pt:"Verde neon & magenta"}, score:{cyberpunk:3} },
+      { t:{en:"Pastel & soft tones",fi:"Pastelli & pehmeät sävyt",sv:"Pastell & mjuka toner",de:"Pastell & sanfte Töne",es:"Pastel & tonos suaves",fr:"Pastel & tons doux",ja:"パステル＆ソフトトーン",pt:"Pastel & tons suaves"}, score:{glass:2,clean:2} }
+    ]
+  },
+  {
+    q: { en:"What mood fits your daily life?", fi:"Mikä tunnelma sopii parhaiten arkeesi?", sv:"Vilken stämning passar ditt vardagsliv?", de:"Welche Stimmung passt zu deinem Alltag?", es:"¿Qué estado de ánimo encaja en tu vida diaria?", fr:"Quelle ambiance correspond à votre vie quotidienne?", ja:"日常生活に合う雰囲気は？", pt:"Que humor combina com sua vida diária?" },
+    options: [
+      { t:{en:"Calm & focused",fi:"Rauhallinen ja keskittynyt",sv:"Lugn & fokuserad",de:"Ruhig & fokussiert",es:"Calmado & enfocado",fr:"Calme & concentré",ja:"穏やかで集中した",pt:"Calmo & focado"}, score:{minimal:3,clean:2} },
+      { t:{en:"Inspiring & premium",fi:"Inspiroiva ja premium",sv:"Inspirerande & premium",de:"Inspirierend & premium",es:"Inspirador & premium",fr:"Inspirant & premium",ja:"インスピレーションとプレミアム",pt:"Inspirador & premium"}, score:{luxury:3,warm:1} },
+      { t:{en:"Dynamic & futuristic",fi:"Dynaaminen ja tulevaisuudellinen",sv:"Dynamisk & futuristisk",de:"Dynamisch & futuristisch",es:"Dinámico & futurista",fr:"Dynamique & futuriste",ja:"ダイナミックで未来的",pt:"Dinâmico & futurista"}, score:{cyberpunk:3,glass:1} },
+      { t:{en:"Playful & nostalgic",fi:"Leikkisä ja nostalginen",sv:"Lekfull & nostalgisk",de:"Verspielt & nostalgisch",es:"Lúdico & nostálgico",fr:"Ludique & nostalgique",ja:"遊び心と懐かしさ",pt:"Divertido & nostálgico"}, score:{y2k:3,dark:1} }
+    ]
+  },
+  {
+    q: { en:"Widgets & info on screen?", fi:"Widgetit ja tiedot näytöllä?", sv:"Widgets & info på skärmen?", de:"Widgets & Infos auf dem Bildschirm?", es:"¿Widgets e información en pantalla?", fr:"Widgets & informations sur l'écran?", ja:"画面上のウィジェットと情報？", pt:"Widgets & informações na tela?" },
+    options: [
+      { t:{en:"One elegant widget",fi:"Vain yksi tyylikäs widget",sv:"En elegant widget",de:"Nur ein elegantes Widget",es:"Un widget elegante",fr:"Un seul widget élégant",ja:"1つのエレガントなウィジェット",pt:"Um widget elegante"}, score:{luxury:3,minimal:2} },
+      { t:{en:"Several useful ones",fi:"Useita hyödyllisiä",sv:"Flera användbara",de:"Mehrere nützliche",es:"Varios útiles",fr:"Plusieurs utiles",ja:"いくつか便利なもの",pt:"Vários úteis"}, score:{clean:2,y2k:1} },
+      { t:{en:"As little as possible",fi:"Mahdollisimman vähän",sv:"Så lite som möjligt",de:"So wenig wie möglich",es:"Lo menos posible",fr:"Le moins possible",ja:"できるだけ少なく",pt:"O mínimo possível"}, score:{minimal:3,dark:2} },
+      { t:{en:"Visual & rich elements",fi:"Visuaalisia elementtejä",sv:"Visuella element",de:"Visuelle Elemente",es:"Elementos visuales",fr:"Éléments visuels",ja:"視覚的で豊かな要素",pt:"Elementos visuais"}, score:{glass:3,cyberpunk:1} }
+    ]
+  }
+];
+
+// ============================================================
+//  APP STATE
+// ============================================================
+let state = {
+  theme: 'luxury',
+  wallpaper: 0,
+  icons: JSON.parse(JSON.stringify(defaultIcons)),
+  streak: 7,
+  xp: 2480,
+  username: 'Nova',
+  colorScheme: 'dark',
+  lang: 'en'
+};
+
+let editingIconIndex = null;
+let quizStep = 0;
+let quizAnswers = [];
+let deferredInstallPrompt = null;
+
+// ============================================================
+//  INIT
+// ============================================================
+function init() {
+  loadState();
+  currentLang = state.lang || 'en';
+  document.documentElement.setAttribute('data-theme', state.colorScheme);
+
+  renderThemeList();
+  renderWallpaperGrid();
+  renderIcons();
+  applyTheme(state.theme, false);
+  applyWallpaper(state.wallpaper, false);
+  updateStats();
+  updateCurrentSetupInfo();
+  applyTranslations();
+  updatePhoneTime();
+
+  setInterval(updatePhoneTime, 10000);
+
+  // PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    document.getElementById('install-btn').classList.add('visible');
+  });
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('install-btn').classList.remove('visible');
+    showToast('DeviceForge installed! 📱');
+    confetti(20);
+  });
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS && !window.navigator.standalone) {
+    setTimeout(() => {
+      const btn = document.getElementById('install-btn');
+      if (!btn.classList.contains('visible')) {
+        btn.innerHTML = '<i class="fa-solid fa-share-from-square"></i><span>Add to Home</span>';
+        btn.classList.add('visible');
+        btn.onclick = () => showToast(t('installTip'));
+      }
+    }, 6000);
+  }
+
+  // Konami code
+  let konamiSeq = [];
+  const konamiCode = [38,38,40,40,37,39,37,39,66,65];
+  document.addEventListener('keydown', e => {
+    konamiSeq.push(e.keyCode);
+    if (konamiSeq.length > 10) konamiSeq.shift();
+    if (konamiSeq.join(',') === konamiCode.join(',')) {
+      applyTheme('cyberpunk');
+      confetti(40);
+      showToast('🔥 Secret Cyberpunk Mode unlocked!');
+      konamiSeq = [];
+    }
+    if (e.metaKey && e.key === 's') { e.preventDefault(); saveCurrentSetup(); }
+    if (e.key === '?') openStyleQuiz();
+  });
+
+  if (!localStorage.getItem('df_welcomed')) {
+    setTimeout(() => {
+      showToast('Welcome to DeviceForge! Tap an icon to customize it.');
+      localStorage.setItem('df_welcomed', '1');
+    }, 3000);
+  }
+}
+
+function updatePhoneTime() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2,'0');
+  const m = now.getMinutes().toString().padStart(2,'0');
+  document.getElementById('phone-time').textContent = `${h}:${m}`;
+
+  const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const d = now.getDate();
+  const mo = now.getMonth() + 1;
+  document.getElementById('phone-date-text').textContent = `${days[now.getDay()]} ${d}.${mo}`;
+}
+
+// ============================================================
+//  THEMES
+// ============================================================
+function renderThemeList() {
+  const list = document.getElementById('theme-list');
+  list.innerHTML = '';
+  themes.forEach(th => {
+    const item = document.createElement('div');
+    item.className = 'theme-item' + (state.theme === th.id ? ' active' : '');
+    item.innerHTML = `
+      <div class="theme-swatch" style="background:${th.color}18;color:${th.color}">
+        <i class="fa-solid ${th.icon}"></i>
+      </div>
+      <div class="theme-item-info">
+        <div class="theme-item-name">${th.name}</div>
+        <div class="theme-item-desc">${th.desc}</div>
+      </div>
+    `;
+    item.onclick = () => { applyTheme(th.id); addXP(25); };
+    list.appendChild(item);
+  });
+}
+
+function applyTheme(themeId, animate = true) {
+  state.theme = themeId;
+  const theme = themes.find(t => t.id === themeId);
+  if (!theme) return;
+
+  // Icon background per theme
+  const getIconBg = (iconColor) => {
+    if (themeId === 'minimal')     return '#333344';
+    if (themeId === 'cyberpunk')   return '#0a2233';
+    if (themeId === 'dark')        return '#1a1a2e';
+    if (themeId === 'neon')        return '#1a0030';
+    if (themeId === 'marble')      return 'rgba(200,196,190,0.25)';
+    if (themeId === 'sakura')      return 'rgba(255,183,197,0.2)';
+    if (themeId === 'arctic')      return 'rgba(168,216,234,0.25)';
+    if (themeId === 'brutalist')   return '#111100';
+    if (themeId === 'cottagecore') return 'rgba(163,184,153,0.2)';
+    if (themeId === 'midnight')    return '#0f0a24';
+    if (themeId === 'desert')      return '#2c1a0e';
+    return iconColor;
+  };
+
+  document.querySelectorAll('.phone-icon-circle').forEach((el, i) => {
+    if (state.icons[i]) {
+      el.style.background = getIconBg(state.icons[i].color);
+      el.style.boxShadow = `0 4px 12px ${theme.color}22, inset 0 1px 0 rgba(255,255,255,0.2)`;
+    }
+  });
+
+  document.querySelectorAll('.phone-dock-icon').forEach(el => {
+    el.style.background = themeId === 'cyberpunk' || themeId === 'neon' ? '#001122' : 'rgba(255,255,255,0.1)';
+  });
+
+  document.querySelectorAll('.theme-item').forEach((el, idx) => {
+    el.classList.toggle('active', themes[idx].id === themeId);
+  });
+
+  updateCurrentSetupInfo();
+
+  if (animate) {
+    const phone = document.getElementById('phone-outer');
+    phone.style.transition = 'transform 0.25s cubic-bezier(0.23,1,0.32,1)';
+    phone.style.transform = 'scale(0.96)';
+    setTimeout(() => { phone.style.transform = 'scale(1)'; }, 200);
+  }
+
+  saveState();
+}
+
+// ============================================================
+//  WALLPAPERS
+// ============================================================
+function renderWallpaperGrid() {
+  const grid = document.getElementById('wallpaper-grid');
+  grid.innerHTML = '';
+  wallpapers.slice(0, 6).forEach(wp => {
+    const el = document.createElement('div');
+    el.className = 'wp-thumb' + (state.wallpaper === wp.id ? ' active' : '');
+    el.style.background = wp.css;
+    el.innerHTML = `<div class="wp-thumb-name">${wp.name}</div>`;
+    el.onclick = () => { applyWallpaper(wp.id); addXP(15); };
+    grid.appendChild(el);
+  });
+}
+
+function applyWallpaper(wpId, animate = true) {
+  state.wallpaper = wpId;
+  const wp = wallpapers.find(w => w.id === wpId);
+  if (!wp) return;
+
+  const layer = document.getElementById('phone-wallpaper');
+  layer.style.background = wp.css;
+
+  document.querySelectorAll('#wallpaper-grid .wp-thumb').forEach((el, i) => {
+    el.classList.toggle('active', wallpapers[i].id === wpId);
+  });
+
+  if (animate) {
+    layer.style.opacity = '0';
+    setTimeout(() => { layer.style.transition = 'opacity 0.4s'; layer.style.opacity = '1'; }, 10);
+  }
+
+  updateCurrentSetupInfo();
+  saveState();
+}
+
+function showAllWallpapers() {
+  const grid = document.getElementById('all-wallpapers-grid');
+  grid.innerHTML = '';
+  wallpapers.forEach(wp => {
+    const el = document.createElement('div');
+    el.className = 'wp-thumb' + (state.wallpaper === wp.id ? ' active' : '');
+    el.style.background = wp.css;
+    el.style.aspectRatio = '9/16';
+    el.innerHTML = `<div class="wp-thumb-name">${wp.name}</div>`;
+    el.onclick = () => { applyWallpaper(wp.id); addXP(15); closeModal('wallpapers-modal'); };
+    grid.appendChild(el);
+  });
+  openModal('wallpapers-modal');
+}
+
+// ============================================================
+//  ICONS
+// ============================================================
+function renderIcons() {
+  const grid = document.getElementById('icons-grid');
+  grid.innerHTML = '';
+  const theme = themes.find(t => t.id === state.theme) || themes[0];
+
+  state.icons.forEach((icon, i) => {
+    const el = document.createElement('div');
+    el.className = 'phone-icon';
+    const bgColor = state.theme === 'minimal' ? '#333344' :
+      state.theme === 'cyberpunk' ? '#0a2233' :
+      state.theme === 'dark' ? '#1a1a2e' : icon.color;
+
+    el.innerHTML = `
+      <div class="phone-icon-circle" style="background:${bgColor};box-shadow:0 4px 12px ${theme.color}22,inset 0 1px 0 rgba(255,255,255,0.2)">
+        <span>${icon.emoji}</span>
+      </div>
+      <div class="phone-icon-label">${iconLabel(icon)}</div>
+    `;
+    el.onclick = () => openIconPicker(i);
+    grid.appendChild(el);
+  });
+
+  renderDock();
+}
+
+function renderDock() {
+  const dock = document.getElementById('phone-dock');
+  dock.innerHTML = '';
+  const theme = themes.find(t => t.id === state.theme) || themes[0];
+  [0,1,2,3].forEach(i => {
+    const icon = state.icons[i] || iconLibrary[i];
+    const el = document.createElement('div');
+    el.className = 'phone-dock-icon';
+    el.style.background = state.theme === 'cyberpunk' ? '#001122' : icon.color + '33';
+    el.innerHTML = icon.emoji;
+    el.onclick = () => openIconPicker(i);
+    dock.appendChild(el);
+  });
+}
+
+function openIconPicker(index) {
+  editingIconIndex = index;
+  const grid = document.getElementById('icon-picker-grid');
+  grid.innerHTML = '';
+  document.getElementById('icon-modal-sub').textContent = t('changeIcon') + ': ' + iconLabel(state.icons[index]);
+
+  iconLibrary.forEach(lib => {
+    const item = document.createElement('div');
+    item.className = 'icon-pick-item' + (state.icons[index].emoji === lib.emoji ? ' selected' : '');
+    item.innerHTML = `
+      <div class="icon-pick-circle" style="background:${lib.color}20">
+        <span style="font-size:22px">${lib.emoji}</span>
+      </div>
+      <div class="icon-pick-label">${iconLabel(lib)}</div>
+    `;
+    item.onclick = () => {
+      state.icons[index] = { ...lib, id: index };
+      renderIcons();
+      closeModal('icon-modal');
+      addXP(10);
+      updateCurrentSetupInfo();
+      saveState();
+    };
+    grid.appendChild(item);
+  });
+  openModal('icon-modal');
+}
+
+// ============================================================
+//  CURRENT SETUP INFO
+// ============================================================
+function updateCurrentSetupInfo() {
+  const container = document.getElementById('setup-info');
+  const theme = themes.find(th => th.id === state.theme);
+  const wp = wallpapers.find(w => w.id === state.wallpaper);
+  container.innerHTML = `
+    <div class="setup-row">
+      <span class="setup-row-label">${t('theme')}</span>
+      <span class="setup-row-val" style="color:${theme.color}">${theme.name}</span>
+    </div>
+    <div class="setup-row">
+      <span class="setup-row-label">${t('wallpaper')}</span>
+      <span class="setup-row-val">${wp.name}</span>
+    </div>
+    <div class="setup-row">
+      <span class="setup-row-label">${t('icons')}</span>
+      <span class="setup-row-val">${state.icons.length}</span>
+    </div>
+  `;
+}
+
+// ============================================================
+//  QUICK ACTIONS
+// ============================================================
+function randomizeSetup() {
+  const randTheme = themes[Math.floor(Math.random() * themes.length)].id;
+  const randWp = Math.floor(Math.random() * wallpapers.length);
+  applyTheme(randTheme);
+  applyWallpaper(randWp);
+  state.icons.forEach((icon, i) => {
+    if (Math.random() > 0.5) {
+      const randLib = iconLibrary[Math.floor(Math.random() * iconLibrary.length)];
+      state.icons[i] = { ...randLib, id: i };
+    }
+  });
+  renderIcons();
+  updateCurrentSetupInfo();
+  addXP(45);
+  showToast(t('randomized'));
+}
+
+function resetToDefault() {
+  state.theme = 'luxury'; state.wallpaper = 0;
+  state.icons = JSON.parse(JSON.stringify(defaultIcons));
+  applyTheme('luxury', false);
+  applyWallpaper(0, false);
+  renderThemeList();
+  renderIcons();
+  renderWallpaperGrid();
+  updateCurrentSetupInfo();
+  showToast(t('resetDone'));
+}
+
+function completeDailyChallenge() {
+  addXP(120);
+  state.streak++;
+  document.getElementById('streak-val').textContent = state.streak;
+  showToast(t('challengeDone'));
+  confetti(20);
+  applyTheme('luxury');
+  saveState();
+}
+
+function shareSetup() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'DeviceForge Setup',
+      text: `Check out my ${themes.find(t => t.id === state.theme).name} setup on DeviceForge!`,
+      url: window.location.href
+    }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      showToast('Link copied to clipboard!');
+    });
+  }
+}
+
+// ============================================================
+//  SAVE / LOAD
+// ============================================================
+function saveCurrentSetup() {
+  const name = prompt(t('saveSetupName'), `Setup ${new Date().toLocaleDateString()}`);
+  if (!name) return;
+  const setups = JSON.parse(localStorage.getItem('df_setups') || '[]');
+  setups.unshift({ id: Date.now(), name, theme: state.theme, wallpaper: state.wallpaper, icons: JSON.parse(JSON.stringify(state.icons)), date: new Date().toISOString(), xp: state.xp });
+  if (setups.length > 10) setups.length = 10;
+  localStorage.setItem('df_setups', JSON.stringify(setups));
+  addXP(80);
+  showToast(`"${name}" ${t('setupSaved')}`);
+  confetti(16);
+}
+
+function showSavedSetups() {
+  const setups = JSON.parse(localStorage.getItem('df_setups') || '[]');
+  const container = document.getElementById('setups-list');
+  if (setups.length === 0) {
+    container.innerHTML = `<div style="text-align:center;color:var(--text3);padding:30px 0;font-family:var(--mono);font-size:13px">${t('noSetups')}</div>`;
+  } else {
+    container.innerHTML = setups.map(s => {
+      const theme = themes.find(th => th.id === s.theme);
+      return `<div class="setup-item" onclick="loadSetup(${s.id})">
+        <div>
+          <div style="font-size:14px;font-weight:500">${s.name}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono)">${new Date(s.date).toLocaleDateString()} · ${theme ? theme.name : s.theme}</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent)">+${Math.floor(Math.random()*60)+40} XP</div>
+      </div>`;
+    }).join('');
+  }
+  openModal('setups-modal');
+}
+
+function loadSetup(id) {
+  const setups = JSON.parse(localStorage.getItem('df_setups') || '[]');
+  const setup = setups.find(s => s.id === id);
+  if (!setup) return;
+  state.theme = setup.theme; state.wallpaper = setup.wallpaper; state.icons = JSON.parse(JSON.stringify(setup.icons));
+  applyTheme(state.theme, false); applyWallpaper(state.wallpaper, false);
+  renderThemeList(); renderIcons(); renderWallpaperGrid(); updateCurrentSetupInfo();
+  closeModal('setups-modal');
+  showToast(t('setupLoaded'));
+}
+
+// ============================================================
+//  AI ADVISOR
+// ============================================================
+async function openAIAdvisor() {
+  openModal('ai-modal');
+  const body = document.getElementById('ai-modal-body');
+  const theme = themes.find(t => t.id === state.theme);
+  const wp = wallpapers.find(w => w.id === state.wallpaper);
+
+  body.innerHTML = `
+    <div class="ai-thinking">
+      <div class="ai-spinner"></div>
+      <span>${t('aiThinking')}</span>
+    </div>
+  `;
+
+  const prompt = `You are a stylish home screen design expert. The user has: theme="${theme.name}", wallpaper="${wp.name}", ${state.icons.length} icons. Give 3 concise, specific improvement suggestions (2–3 sentences total). Be direct, enthusiastic, design-focused. No intro fluff.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 350,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(c => c.text || '').join('') || 'Unable to get advice right now.';
+    body.innerHTML = `
+      <div class="ai-bubble">${text.replace(/\n/g, '<br>')}</div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-primary" style="padding:9px 18px;font-size:13px" onclick="randomizeSetup();closeModal('ai-modal')">
+          <i class="fa-solid fa-shuffle"></i> ${t('randomize')}
+        </button>
+        <button class="btn-secondary" style="padding:9px 16px;font-size:13px" onclick="closeModal('ai-modal')">${t('cancel')}</button>
+      </div>
+    `;
+  } catch(err) {
+    body.innerHTML = `<div class="ai-bubble" style="color:var(--text2)">Style AI is offline. Try: swap to ${themes[Math.floor(Math.random()*themes.length)].name} theme + ${wallpapers[Math.floor(Math.random()*wallpapers.length)].name} wallpaper for a fresh look!</div>`;
+  }
+}
+
+// ============================================================
+//  STYLE QUIZ
+// ============================================================
+function openStyleQuiz() {
+  quizStep = 0; quizAnswers = [];
+  renderQuizStep();
+  openModal('quiz-modal');
+}
+
+function renderQuizStep() {
+  const q = quizQuestions[quizStep];
+  const body = document.getElementById('quiz-body');
+  const label = document.getElementById('quiz-progress-label');
+  const nextText = document.getElementById('quiz-next-text');
+
+  label.textContent = `${quizStep + 1} / ${quizQuestions.length}`;
+  nextText.textContent = quizStep === quizQuestions.length - 1 ? t('finish') : t('next');
+
+  const progress = ((quizStep + 1) / quizQuestions.length) * 100;
+  body.innerHTML = `
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${progress}%"></div></div>
+    <div class="quiz-question-text">${q.q[currentLang] || q.q.en}</div>
+    ${q.options.map((opt, i) => `
+      <div class="quiz-option${quizAnswers[quizStep] === i ? ' selected' : ''}" onclick="selectQuizOpt(${i})">
+        <div class="quiz-radio"></div>
+        <span>${opt.t[currentLang] || opt.t.en}</span>
+      </div>
+    `).join('')}
+  `;
+
+  document.getElementById('quiz-prev').disabled = quizStep === 0;
+  document.getElementById('quiz-next').style.display = 'flex';
+}
+
+function selectQuizOpt(i) {
+  quizAnswers[quizStep] = i;
+  document.querySelectorAll('#quiz-body .quiz-option').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+}
+
+function nextQ() {
+  if (quizAnswers[quizStep] === undefined) { showToast(t('selectOption')); return; }
+  if (quizStep < quizQuestions.length - 1) { quizStep++; renderQuizStep(); }
+  else finishQuiz();
+}
+
+function prevQ() { if (quizStep > 0) { quizStep--; renderQuizStep(); } }
+
+function finishQuiz() {
+  let scores = {};
+  quizAnswers.forEach((ansIdx, qIdx) => {
+    const scoreObj = quizQuestions[qIdx].options[ansIdx]?.score || {};
+    Object.entries(scoreObj).forEach(([k, v]) => { scores[k] = (scores[k] || 0) + v; });
+  });
+  let best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0]?.[0] || 'minimal';
+  const theme = themes.find(t => t.id === best) || themes[0];
+
+  document.getElementById('quiz-body').innerHTML = `
+    <div style="text-align:center;padding:10px 0">
+      <div style="width:72px;height:72px;border-radius:50%;background:${theme.color}18;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px;color:${theme.color}">
+        <i class="fa-solid ${theme.icon}"></i>
+      </div>
+      <div style="font-family:var(--serif);font-size:16px;color:var(--text2);margin-bottom:6px">${t('yourStyleIs')}</div>
+      <div style="font-family:var(--serif);font-size:34px;font-weight:600;color:${theme.color};margin-bottom:8px">${theme.name}</div>
+      <div style="font-size:13px;color:var(--text2);max-width:280px;margin:0 auto 24px">${theme.desc}</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-primary" style="padding:10px 20px;font-size:13px" onclick="applyTheme('${best}');closeModal('quiz-modal');confetti(20);showToast(t('quizDone'))">
+          ${t('applyTheme')}
+        </button>
+        <button class="btn-secondary" style="padding:10px 16px;font-size:13px" onclick="closeModal('quiz-modal')">${t('noThanks')}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('quiz-footer').style.display = 'none';
+  addXP(95);
+}
+
+// ============================================================
+//  MODALS
+// ============================================================
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.getElementById('quiz-footer').style.display = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', function(e) {
+    if (e.target === this) closeModal(this.id);
+  });
+});
+
+function openWeatherModal() { openModal('weather-modal'); }
+
+// ============================================================
+//  UTILS
+// ============================================================
+function addXP(amount) {
+  state.xp += amount;
+  document.getElementById('xp-val').textContent = state.xp.toLocaleString();
+  if (amount > 20) confetti(10);
+  saveState();
+}
+
+function updateStats() {
+  document.getElementById('streak-val').textContent = state.streak;
+  document.getElementById('xp-val').textContent = state.xp.toLocaleString();
+  document.getElementById('user-name-display').textContent = state.username;
+  document.getElementById('user-avatar').textContent = state.username.charAt(0).toUpperCase();
+}
+
+function editName() {
+  const name = prompt(t('enterName'), state.username);
+  if (name && name.trim()) {
+    state.username = name.trim();
+    updateStats();
+    saveState();
+  }
+}
+
+function toggleColorScheme() {
+  state.colorScheme = state.colorScheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', state.colorScheme);
+  document.getElementById('theme-icon').className = state.colorScheme === 'dark' ? 'fa-solid fa-circle-half-stroke' : 'fa-regular fa-circle-half-stroke';
+  saveState();
+}
+
+function showToast(msg) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 2700);
+}
+
+function confetti(count = 12) {
+  const colors = ['#c8b67a', '#4ade80', '#60a5fa', '#f472b6', '#fb923c'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left:${Math.random()*100}vw; top:-10px;
+        width:${Math.random()*7+4}px; height:${Math.random()*7+4}px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+        animation-duration:${Math.random()*1.5+2}s;
+        transform:rotate(${Math.random()*360}deg);
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }, i * 40);
+  }
+}
+
+function capturePreview() {
+  showToast('Screenshot feature works best in your browser\'s built-in screenshot tool. (Cmd+Shift+4 / Print Screen)');
+}
+
+function installPWA() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(choice => {
+      deferredInstallPrompt = null;
+      if (choice.outcome === 'accepted') {
+        document.getElementById('install-btn').classList.remove('visible');
+      }
+    });
+  } else {
+    showToast(t('installTip'));
+  }
+}
+
+// ============================================================
+//  STATE PERSISTENCE
+// ============================================================
+function saveState() {
+  localStorage.setItem('df_state', JSON.stringify({ ...state, lang: currentLang }));
+}
+
+function loadState() {
+  const saved = localStorage.getItem('df_state');
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    if (data.theme) state.theme = data.theme;
+    if (data.wallpaper !== undefined) state.wallpaper = data.wallpaper;
+    if (data.icons?.length) state.icons = data.icons;
+    if (data.streak) state.streak = data.streak;
+    if (data.xp) state.xp = data.xp;
+    if (data.username) state.username = data.username;
+    if (data.colorScheme) state.colorScheme = data.colorScheme;
+    if (data.lang) currentLang = data.lang;
+  } catch(e) {}
+}
+
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
