@@ -1220,29 +1220,49 @@ document.addEventListener('click', e => {
 //  DATA
 // ============================================================
 const themes = [
-  { id:'luxury',    name:'Quiet Luxury', icon:'fa-gem',           color:'#c8b67a', desc:'Brass & ivory' },
-  { id:'minimal',   name:'Minimal',      icon:'fa-minus',          color:'#888899', desc:'Pure & calm' },
-  { id:'dark',      name:'Dark Mode',    icon:'fa-moon',           color:'#3b3b55', desc:'Deep black' },
-  { id:'cyberpunk', name:'Cyberpunk',    icon:'fa-robot',          color:'#22d3ee', desc:'Neon & magenta' },
-  { id:'glass',     name:'Glass',        icon:'fa-window-maximize',color:'#bae6fd', desc:'Frosted pane' },
-  { id:'y2k',       name:'Y2K',          icon:'fa-globe',          color:'#f472b6', desc:'Metal & pink' },
-  { id:'clean',     name:'Clean',        icon:'fa-leaf',           color:'#86efac', desc:'Fresh & light' },
-  { id:'warm',      name:'Warm Minimal', icon:'fa-sun',            color:'#fb923c', desc:'Warm beige' }
+  { id:'luxury',      name:'Quiet Luxury',  icon:'fa-gem',            color:'#c8b67a', desc:'Brass & ivory' },
+  { id:'minimal',     name:'Minimal',       icon:'fa-minus',           color:'#888899', desc:'Pure & calm' },
+  { id:'dark',        name:'Dark Mode',     icon:'fa-moon',            color:'#3b3b55', desc:'Deep black' },
+  { id:'cyberpunk',   name:'Cyberpunk',     icon:'fa-robot',           color:'#22d3ee', desc:'Neon & magenta' },
+  { id:'glass',       name:'Glass',         icon:'fa-window-maximize', color:'#bae6fd', desc:'Frosted pane' },
+  { id:'y2k',         name:'Y2K',           icon:'fa-globe',           color:'#f472b6', desc:'Metal & pink' },
+  { id:'clean',       name:'Clean',         icon:'fa-leaf',            color:'#86efac', desc:'Fresh & light' },
+  { id:'warm',        name:'Warm Minimal',  icon:'fa-sun',             color:'#fb923c', desc:'Warm beige' },
+  { id:'neon',        name:'Neon Pulse',    icon:'fa-bolt',            color:'#ff00ff', desc:'Electric & vivid' },
+  { id:'marble',      name:'Marble',        icon:'fa-circle',          color:'#d4cfc9', desc:'Stone & elegant' },
+  { id:'sakura',      name:'Sakura',        icon:'fa-pagelines',       color:'#ffb7c5', desc:'Soft cherry blossom' },
+  { id:'arctic',      name:'Arctic',        icon:'fa-snowflake',       color:'#a8d8ea', desc:'Icy & crisp' },
+  { id:'brutalist',   name:'Brutalist',     icon:'fa-square',          color:'#e8e800', desc:'Raw & bold' },
+  { id:'cottagecore', name:'Cottagecore',   icon:'fa-seedling',        color:'#a3b899', desc:'Nature & cozy' },
+  { id:'midnight',    name:'Midnight',      icon:'fa-star',            color:'#7c6af5', desc:'Deep violet night' },
+  { id:'desert',      name:'Desert Sand',   icon:'fa-sun',             color:'#d4956a', desc:'Warm terracotta' }
 ];
 
 const wallpapers = [
-  { id:0,  name:'Aurora',   css:'linear-gradient(135deg,#0f172a 0%,#1e3a8a 40%,#312e81 100%)' },
-  { id:1,  name:'Liquid',   css:'linear-gradient(160deg,#164e63 0%,#0e7490 50%,#155e75 100%)' },
-  { id:2,  name:'Nocturne', css:'linear-gradient(145deg,#111827 0%,#1e2937 100%)' },
-  { id:3,  name:'Prism',    css:'linear-gradient(120deg,#312e81 0%,#581c87 50%,#831843 100%)' },
-  { id:4,  name:'Vapor',    css:'linear-gradient(135deg,#1e2937 0%,#334155 100%)' },
-  { id:5,  name:'Halo',     css:'linear-gradient(155deg,#1e3a8a 0%,#312e81 70%,#4c1d95 100%)' },
-  { id:6,  name:'Drift',    css:'linear-gradient(140deg,#134e4b 0%,#0f766e 60%,#115e59 100%)' },
-  { id:7,  name:'Glow',     css:'linear-gradient(130deg,#713f12 0%,#854d0e 50%,#713f12 100%)' },
-  { id:8,  name:'Frost',    css:'linear-gradient(150deg,#0c4a6e 0%,#164e63 100%)' },
-  { id:9,  name:'Ember',    css:'linear-gradient(120deg,#431407 0%,#78350f 100%)' },
-  { id:10, name:'Ocean',    css:'linear-gradient(145deg,#0e7490 0%,#164e63 100%)' },
-  { id:11, name:'Void',     css:'linear-gradient(180deg,#09090b 0%,#18181b 100%)' }
+  { id:0,  name:'Aurora',      css:'linear-gradient(135deg,#0f172a 0%,#1e3a8a 40%,#312e81 100%)' },
+  { id:1,  name:'Liquid',      css:'linear-gradient(160deg,#164e63 0%,#0e7490 50%,#155e75 100%)' },
+  { id:2,  name:'Nocturne',    css:'linear-gradient(145deg,#111827 0%,#1e2937 100%)' },
+  { id:3,  name:'Prism',       css:'linear-gradient(120deg,#312e81 0%,#581c87 50%,#831843 100%)' },
+  { id:4,  name:'Vapor',       css:'linear-gradient(135deg,#1e2937 0%,#334155 100%)' },
+  { id:5,  name:'Halo',        css:'linear-gradient(155deg,#1e3a8a 0%,#312e81 70%,#4c1d95 100%)' },
+  { id:6,  name:'Drift',       css:'linear-gradient(140deg,#134e4b 0%,#0f766e 60%,#115e59 100%)' },
+  { id:7,  name:'Glow',        css:'linear-gradient(130deg,#713f12 0%,#854d0e 50%,#713f12 100%)' },
+  { id:8,  name:'Frost',       css:'linear-gradient(150deg,#0c4a6e 0%,#164e63 100%)' },
+  { id:9,  name:'Ember',       css:'linear-gradient(120deg,#431407 0%,#78350f 100%)' },
+  { id:10, name:'Ocean',       css:'linear-gradient(145deg,#0e7490 0%,#164e63 100%)' },
+  { id:11, name:'Void',        css:'linear-gradient(180deg,#09090b 0%,#18181b 100%)' },
+  { id:12, name:'Neon City',   css:'linear-gradient(135deg,#0d0014 0%,#1a0030 40%,#0d0020 100%), radial-gradient(ellipse at 20% 50%,#ff00ff44 0%,transparent 60%), radial-gradient(ellipse at 80% 50%,#00ffff44 0%,transparent 60%)' },
+  { id:13, name:'Neon Sunset', css:'linear-gradient(160deg,#0a0010 0%,#2d0050 30%,#ff006622 60%,#ff00aa11 100%)' },
+  { id:14, name:'Electric',    css:'linear-gradient(120deg,#000814 0%,#001233 50%,#0077b6 100%)' },
+  { id:15, name:'Plasma',      css:'linear-gradient(135deg,#10002b 0%,#3c096c 40%,#e0aaff22 100%)' },
+  { id:16, name:'Marble White',css:'linear-gradient(135deg,#f5f5f0 0%,#e8e4df 30%,#f0ede8 60%,#ddd8d0 100%)' },
+  { id:17, name:'Marble Dark', css:'linear-gradient(145deg,#1a1a1a 0%,#2d2d2d 30%,#1f1f1f 60%,#333 100%)' },
+  { id:18, name:'Marble Rose', css:'linear-gradient(135deg,#f8e8e8 0%,#ead5d5 30%,#f5e0e0 60%,#e8d0d0 100%)' },
+  { id:19, name:'Sakura',      css:'linear-gradient(145deg,#1a0a12 0%,#2d1020 40%,#ffb7c522 80%,#1a0a12 100%)' },
+  { id:20, name:'Arctic',      css:'linear-gradient(155deg,#e8f4fd 0%,#c9e8f5 40%,#a8d8ea 100%)' },
+  { id:21, name:'Desert',      css:'linear-gradient(135deg,#2c1a0e 0%,#5c3a1e 40%,#d4956a44 100%)' },
+  { id:22, name:'Midnight',    css:'linear-gradient(145deg,#0a0818 0%,#1a1035 50%,#0f0a24 100%)' },
+  { id:23, name:'Cottagecore', css:'linear-gradient(135deg,#1a2412 0%,#2d3d20 40%,#3d5030 100%)' }
 ];
 
 const iconLibrary = [
@@ -1263,7 +1283,31 @@ const iconLibrary = [
   { emoji:'❤️',  label:{en:'Health',fi:'Terveys',sv:'Hälsa',de:'Gesundheit',es:'Salud',fr:'Santé',ja:'健康',pt:'Saúde'}, color:'#f43f5e' },
   { emoji:'🎮',  label:{en:'Games',fi:'Pelit',sv:'Spel',de:'Spiele',es:'Juegos',fr:'Jeux',ja:'ゲーム',pt:'Jogos'}, color:'#c026d3' },
   { emoji:'📚',  label:{en:'Books',fi:'Kirjat',sv:'Böcker',de:'Bücher',es:'Libros',fr:'Livres',ja:'本',pt:'Livros'}, color:'#0ea5e9' },
-  { emoji:'✈️',  label:{en:'Travel',fi:'Matkailu',sv:'Resor',de:'Reisen',es:'Viajes',fr:'Voyage',ja:'旅行',pt:'Viagem'}, color:'#06b67f' }
+  { emoji:'✈️',  label:{en:'Travel',fi:'Matkailu',sv:'Resor',de:'Reisen',es:'Viajes',fr:'Voyage',ja:'旅行',pt:'Viagem'}, color:'#06b67f' },
+  { emoji:'🏋️',  label:{en:'Fitness',fi:'Liikunta',sv:'Fitness',de:'Fitness',es:'Fitness',fr:'Fitness',ja:'フィットネス',pt:'Fitness'}, color:'#f97316' },
+  { emoji:'🍎',  label:{en:'Food',fi:'Ruoka',sv:'Mat',de:'Essen',es:'Comida',fr:'Nourriture',ja:'食べ物',pt:'Comida'}, color:'#ef4444' },
+  { emoji:'🛍️',  label:{en:'Shopping',fi:'Ostokset',sv:'Shopping',de:'Einkaufen',es:'Compras',fr:'Shopping',ja:'ショッピング',pt:'Compras'}, color:'#f472b6' },
+  { emoji:'🎨',  label:{en:'Art',fi:'Taide',sv:'Konst',de:'Kunst',es:'Arte',fr:'Art',ja:'アート',pt:'Arte'}, color:'#e879f9' },
+  { emoji:'💰',  label:{en:'Finance',fi:'Raha',sv:'Ekonomi',de:'Finanzen',es:'Finanzas',fr:'Finances',ja:'お金',pt:'Finanças'}, color:'#22c55e' },
+  { emoji:'🎬',  label:{en:'Video',fi:'Video',sv:'Video',de:'Video',es:'Video',fr:'Vidéo',ja:'動画',pt:'Vídeo'}, color:'#ef4444' },
+  { emoji:'📡',  label:{en:'Podcast',fi:'Podcast',sv:'Podcast',de:'Podcast',es:'Podcast',fr:'Podcast',ja:'ポッドキャスト',pt:'Podcast'}, color:'#8b5cf6' },
+  { emoji:'🔔',  label:{en:'Alerts',fi:'Hälytykset',sv:'Aviseringar',de:'Benachrichtigungen',es:'Alertas',fr:'Alertes',ja:'通知',pt:'Alertas'}, color:'#f59e0b' },
+  { emoji:'🌙',  label:{en:'Sleep',fi:'Uni',sv:'Sömn',de:'Schlaf',es:'Sueño',fr:'Sommeil',ja:'睡眠',pt:'Sono'}, color:'#6366f1' },
+  { emoji:'🧘',  label:{en:'Mindfulness',fi:'Mindfulness',sv:'Mindfulness',de:'Achtsamkeit',es:'Mindfulness',fr:'Pleine conscience',ja:'マインドフルネス',pt:'Mindfulness'}, color:'#14b8a6' },
+  { emoji:'🚀',  label:{en:'Launch',fi:'Käynnistä',sv:'Starta',de:'Start',es:'Lanzar',fr:'Lancer',ja:'起動',pt:'Lançar'}, color:'#f97316' },
+  { emoji:'💡',  label:{en:'Ideas',fi:'Ideat',sv:'Idéer',de:'Ideen',es:'Ideas',fr:'Idées',ja:'アイデア',pt:'Ideias'}, color:'#fbbf24' },
+  { emoji:'🔐',  label:{en:'Security',fi:'Turvallisuus',sv:'Säkerhet',de:'Sicherheit',es:'Seguridad',fr:'Sécurité',ja:'セキュリティ',pt:'Segurança'}, color:'#10b981' },
+  { emoji:'☁️',  label:{en:'Cloud',fi:'Pilvi',sv:'Moln',de:'Cloud',es:'Nube',fr:'Nuage',ja:'クラウド',pt:'Nuvem'}, color:'#38bdf8' },
+  { emoji:'🎯',  label:{en:'Goals',fi:'Tavoitteet',sv:'Mål',de:'Ziele',es:'Metas',fr:'Objectifs',ja:'目標',pt:'Metas'}, color:'#f43f5e' },
+  { emoji:'🌿',  label:{en:'Nature',fi:'Luonto',sv:'Natur',de:'Natur',es:'Naturaleza',fr:'Nature',ja:'自然',pt:'Natureza'}, color:'#4ade80' },
+  { emoji:'🎭',  label:{en:'Events',fi:'Tapahtumat',sv:'Evenemang',de:'Veranstaltungen',es:'Eventos',fr:'Événements',ja:'イベント',pt:'Eventos'}, color:'#c026d3' },
+  { emoji:'🏠',  label:{en:'Home',fi:'Koti',sv:'Hem',de:'Zuhause',es:'Casa',fr:'Maison',ja:'ホーム',pt:'Casa'}, color:'#fb923c' },
+  { emoji:'🚗',  label:{en:'Drive',fi:'Ajo',sv:'Kör',de:'Fahren',es:'Conducir',fr:'Conduire',ja:'ドライブ',pt:'Dirigir'}, color:'#64748b' },
+  { emoji:'📊',  label:{en:'Stats',fi:'Tilastot',sv:'Statistik',de:'Statistik',es:'Estadísticas',fr:'Statistiques',ja:'統計',pt:'Estatísticas'}, color:'#3b82f6' },
+  { emoji:'🤖',  label:{en:'AI',fi:'Tekoäly',sv:'AI',de:'KI',es:'IA',fr:'IA',ja:'AI',pt:'IA'}, color:'#22d3ee' },
+  { emoji:'🌸',  label:{en:'Sakura',fi:'Kirsikka',sv:'Körsbär',de:'Kirsche',es:'Cerezo',fr:'Cerisier',ja:'桜',pt:'Cerejeira'}, color:'#ffb7c5' },
+  { emoji:'💎',  label:{en:'Premium',fi:'Premium',sv:'Premium',de:'Premium',es:'Premium',fr:'Premium',ja:'プレミアム',pt:'Premium'}, color:'#c8b67a' },
+  { emoji:'🔮',  label:{en:'Magic',fi:'Taikuus',sv:'Magi',de:'Magie',es:'Magia',fr:'Magie',ja:'魔法',pt:'Magia'}, color:'#7c3aed' }
 ];
 
 function iconLabel(icon) {
@@ -1460,20 +1504,31 @@ function applyTheme(themeId, animate = true) {
   const theme = themes.find(t => t.id === themeId);
   if (!theme) return;
 
-  // Update icon colors in phone
+  // Icon background per theme
+  const getIconBg = (iconColor) => {
+    if (themeId === 'minimal')     return '#333344';
+    if (themeId === 'cyberpunk')   return '#0a2233';
+    if (themeId === 'dark')        return '#1a1a2e';
+    if (themeId === 'neon')        return '#1a0030';
+    if (themeId === 'marble')      return 'rgba(200,196,190,0.25)';
+    if (themeId === 'sakura')      return 'rgba(255,183,197,0.2)';
+    if (themeId === 'arctic')      return 'rgba(168,216,234,0.25)';
+    if (themeId === 'brutalist')   return '#111100';
+    if (themeId === 'cottagecore') return 'rgba(163,184,153,0.2)';
+    if (themeId === 'midnight')    return '#0f0a24';
+    if (themeId === 'desert')      return '#2c1a0e';
+    return iconColor;
+  };
+
   document.querySelectorAll('.phone-icon-circle').forEach((el, i) => {
     if (state.icons[i]) {
-      el.style.background = themeId === 'minimal' ? '#333344' :
-        themeId === 'cyberpunk' ? '#0a2233' :
-        themeId === 'dark' ? '#1a1a2e' :
-        state.icons[i].color;
+      el.style.background = getIconBg(state.icons[i].color);
       el.style.boxShadow = `0 4px 12px ${theme.color}22, inset 0 1px 0 rgba(255,255,255,0.2)`;
     }
   });
 
-  // Update dock icons
   document.querySelectorAll('.phone-dock-icon').forEach(el => {
-    el.style.background = themeId === 'cyberpunk' ? '#001122' : 'rgba(255,255,255,0.1)';
+    el.style.background = themeId === 'cyberpunk' || themeId === 'neon' ? '#001122' : 'rgba(255,255,255,0.1)';
   });
 
   document.querySelectorAll('.theme-item').forEach((el, idx) => {
